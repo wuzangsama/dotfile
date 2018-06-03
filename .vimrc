@@ -16,10 +16,10 @@ set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
 
 " 界面相关
 silent! set number relativenumber background=dark nowrap guioptions=
-silent! set ruler laststatus=2 noshowmode cursorline colorcolumn=80
+silent! set ruler laststatus=2 showmode cursorline colorcolumn=80
 silent! set list listchars=tab:›\ ,trail:• scrolloff=3
 silent! set mouse=a mousehide guicursor=a:block-blinkon0 helplang=cn
-if has('gui_running') | set guifont=Hack\ Regular\ Nerd\ Font\ Complete:h13 | else | set t_Co=256 | endif
+if has('gui_running') | set guifont=Monaco:h13 | else | set t_Co=256 | endif
 
 " 编辑
 silent! set shiftwidth=4 expandtab tabstop=4 softtabstop=4
@@ -56,12 +56,12 @@ filetype indent on
 
 " 函数 {{{
 " 生成tags
-function! GeneratorTags()
+function! s:generate_tags()
         exec "!ctags -R --sort=1 --c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++ ."
 endfunc
 
 " Strip whitespace
-function! StripTrailingWhitespace()
+function! s:strip_trailing_whitespace()
     " Preparation: save last search, and cursor position.
     let _s=@/
     let l = line(".")
@@ -74,7 +74,7 @@ function! StripTrailingWhitespace()
 endfunction
 
 " 搜索选中项
-function! VisualSelection() range
+function! s:visual_selection() range
     let l:saved_reg = @"
     execute "normal! vgvy"
 
@@ -109,7 +109,7 @@ autocmd vimrc SwapExists * let v:swapchoice = 'o' " 如已打开，自动选择�
 autocmd vimrc BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif " 启动后定位到上次关闭光标位置
 autocmd vimrc FileType haskell,puppet,ruby,yaml setlocal expandtab shiftwidth=2 softtabstop=2
 autocmd vimrc FileType markdown,text setlocal wrap
-autocmd vimrc FileType c,cpp,java,php,javascript,python,rust,xml,yaml,perl,sql autocmd BufWritePre <buffer> call StripTrailingWhitespace()
+autocmd vimrc FileType c,cpp,java,php,javascript,python,rust,xml,yaml,perl,sql autocmd BufWritePre <buffer> call s:strip_trailing_whitespace()
 " autocmd vimrc BufWritePost $MYVIMRC source $MYVIMRC " 让配置变更立即生效
 " }}}
 
@@ -126,7 +126,6 @@ call plug#begin('~/.vim/bundle')
 
 " 外观
 Plug 'junegunn/seoul256.vim'
-Plug 'ryanoasis/vim-devicons'
 Plug 'luochen1990/rainbow'
 
 " 一般功能
@@ -136,6 +135,7 @@ Plug 'vim-scripts/matchit.zip'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-unimpaired'
+Plug 'jiangmiao/auto-pairs'
 Plug 'majutsushi/tagbar'
 Plug 'Shougo/vinarise.vim'
 Plug 'Shougo/vimproc.vim', {'do': 'make'}
@@ -144,7 +144,7 @@ Plug 'Shougo/unite.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
-Plug 'mhinz/vim-signify'
+Plug 'airblade/vim-gitgutter'
 Plug 'junegunn/gv.vim'
 Plug 'junegunn/vim-slash'
 Plug 'junegunn/vim-peekaboo'
@@ -166,15 +166,8 @@ Plug 'lyuts/vim-rtags', { 'for': ['c', 'cpp'] }
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
 Plug 'buoto/gotests-vim'
 
-" 语法检测
-Plug 'vim-syntastic/syntastic'
-" Plug 'w0rp/ale'
-
 " 自动补全
-Plug 'Valloric/YouCompleteMe', {'do': './install.py --clang-completer --system-libclang'}
-Plug 'jiangmiao/auto-pairs'
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
+Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --go-completer --java-completer --system-libclang' }
 
 call plug#end()
 
@@ -186,14 +179,6 @@ if !empty(glob('~/.vim/bundle/seoul256.vim'))
     endif
 
     colorscheme seoul256
-endif
-
-" 在vimfiler中展示图标
-if !empty(glob('~/.vim/bundle/vim-devicons'))
-    " loading the plugin
-    let g:webdevicons_enable = 1
-    " adding the column to vimfiler
-    let g:webdevicons_enable_vimfiler = 1
 endif
 
 " rtags 重新绑定快捷键
@@ -223,10 +208,6 @@ if !empty(glob('~/.vim/bundle/vim-rtags'))
     augroup END
 endif
 
-if !empty(glob('~/.vim/bundle/ultisnips'))
-    let g:UltiSnipsExpandTrigger="<Leader><Tab>"
-endif
-
 if !empty(glob('~/.vim/bundle/vim-easy-align'))
     " Start interactive EasyAlign in visual mode (e.g. vipga)
     xmap ga <Plug>(EasyAlign)
@@ -234,40 +215,10 @@ if !empty(glob('~/.vim/bundle/vim-easy-align'))
     nmap ga <Plug>(EasyAlign)
 endif
 
-if !empty(glob('~/.vim/bundle/syntastic'))
-    let g:syntastic_always_populate_loc_list = 1
-    let g:syntastic_auto_loc_list = 1
-    let g:syntastic_check_on_open = 1
-    let g:syntastic_check_on_wq = 0
-    let g:syntastic_cpp_checkers = ['clang_check']
-    let g:syntastic_c_checkers = ['clang_check']
-    let g:syntastic_clang_check_config_file = '.clang'
-
-    " let g:syntastic_go_checkers = ['golint', 'govec', 'gometalinter']
-    " let g:syntastic_go_gometalinter_args = ['--disable-all', '--enable=errcheck']
-endif
-
-if !empty(glob('~/.vim/bundle/ale'))
-    let g:ale_lint_on_text_changed = 'never'
-    let g:ale_lint_on_enter = 0
-    let g:ale_set_loclist = 0
-    let g:ale_set_quickfix=1
-    let g:ale_open_list=1
-
-    let g:ale_linters = {'go':['gometalinter','gofmt'], 'cpp':['clangcheck','clangtidy'], 'c':['clangtidy']}
-
-    let g:ale_cpp_clang_options='-std=c++11 -Wall'
-endif
-
 if !empty(glob('~/.vim/bundle/YouCompleteMe'))
-    " 不用每次提示加载.ycm_extra_conf.py文件
     let g:ycm_confirm_extra_conf = 0
     let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
 
-    " 关闭ycm的syntastic
-    let g:ycm_show_diagnostics_ui = 0
-
-    "let g:ycm_filetype_whitelist = {'c' : 1, 'cpp' : 1, 'java' : 1, 'python' : 1}
     let g:ycm_filetype_blacklist = {
                 \ 'tagbar' : 1,
                 \ 'qf' : 1,
@@ -286,6 +237,8 @@ if !empty(glob('~/.vim/bundle/YouCompleteMe'))
 
     " 评论中也应用补全
     let g:ycm_complete_in_comments = 1
+
+    let g:ycm_always_populate_location_list = 1
 
     " 两个字开始补全
     let g:ycm_min_num_of_chars_for_completion = 2
@@ -463,7 +416,6 @@ if !empty(glob('~/.vim/bundle/vim-go'))
     let g:go_sameid_search_enabled = 1
 
     let g:go_test_prepend_name = 1
-    let g:go_list_type = "quickfix"
 
     let g:go_auto_type_info = 0
     let g:go_auto_sameids = 0
@@ -539,8 +491,8 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-k> <C-w>k
 nnoremap <C-j> <C-w>j
 
-nnoremap <F4> :call GeneratorTags()<cr><cr>
+nnoremap <F4> :call s:generate_tags()<cr><cr>
 
-vnoremap <Leader>fg :call VisualSelection()<CR>
+vnoremap <Leader>fg :call s:visual_selection()<CR>
 nnoremap <Leader>fg :Ag 
 " }}}
