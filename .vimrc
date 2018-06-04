@@ -109,7 +109,7 @@ autocmd vimrc SwapExists * let v:swapchoice = 'o' " 如已打开，自动选择�
 autocmd vimrc BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif " 启动后定位到上次关闭光标位置
 autocmd vimrc FileType haskell,puppet,ruby,yaml setlocal expandtab shiftwidth=2 softtabstop=2
 autocmd vimrc FileType markdown,text setlocal wrap
-autocmd vimrc FileType c,cpp,java,php,javascript,python,rust,xml,yaml,perl,sql autocmd BufWritePre <buffer> call s:strip_trailing_whitespace()
+autocmd vimrc FileType c,cpp,java,php,javascript,python,rust,xml,yaml,perl,sql autocmd BufWritePre <buffer> call <SID>strip_trailing_whitespace()
 " autocmd vimrc BufWritePost $MYVIMRC source $MYVIMRC " 让配置变更立即生效
 " }}}
 
@@ -428,7 +428,7 @@ if !empty(glob('~/.vim/bundle/vim-go'))
     let g:go_autodetect_gopath = 1
 
     let g:go_metalinter_autosave = 1
-    let g:go_metalinter_autosave_enabled = ['vet', 'golint']
+    let g:go_metalinter_autosave_enabled = ['vet', 'errcheck', 'golint', 'megacheck']
     let g:go_highlight_space_tab_error = 0
     let g:go_highlight_array_whitespace_error = 0
     let g:go_highlight_trailing_whitespace_error = 0
@@ -491,8 +491,8 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-k> <C-w>k
 nnoremap <C-j> <C-w>j
 
-nnoremap <F4> :call s:generate_tags()<cr><cr>
+nnoremap <F4> :call <SID>generate_tags()<cr><cr>
 
-vnoremap <Leader>fg :call s:visual_selection()<CR>
+vnoremap <Leader>fg :call <SID>visual_selection()<CR>
 nnoremap <Leader>fg :Ag 
 " }}}
