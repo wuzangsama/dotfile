@@ -150,6 +150,8 @@ Plug 'junegunn/vim-slash'
 Plug 'junegunn/vim-peekaboo'
 Plug 'nvie/vim-togglemouse'
 Plug 'vim-scripts/ReplaceWithRegister' " gr
+Plug 'terryma/vim-expand-region'
+Plug 'vim-scripts/EasyGrep'
 
 " 所有语言
 Plug 'junegunn/vim-easy-align'
@@ -428,7 +430,7 @@ if !empty(glob('~/.vim/bundle/vim-go'))
     let g:go_autodetect_gopath = 1
 
     let g:go_metalinter_autosave = 1
-    let g:go_metalinter_autosave_enabled = ['vet', 'errcheck', 'golint', 'megacheck']
+    let g:go_metalinter_autosave_enabled = ['vet', 'golint', 'megacheck']
     let g:go_highlight_space_tab_error = 0
     let g:go_highlight_array_whitespace_error = 0
     let g:go_highlight_trailing_whitespace_error = 0
