@@ -12,9 +12,7 @@ git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
 chsh -s /bin/zsh
 
 # 安装一些工具类软件
-apt install -y gcc
-apt install -y g++
-apt install -y make
+apt install -y build-essential
 # apt install -y libtool
 # apt install -y automake
 apt install -y gdb
@@ -58,6 +56,8 @@ apt install -y tcl
 apt install -y tcl-dev
 apt install -y libtcl8.6
 apt install -y libncurses5-dev
+apt install -y python
+apt install -y python-dev
 apt install -y python3
 apt install -y python3-dev
 
@@ -110,7 +110,7 @@ git checkout v8.1.0042
     # --enable-pythoninterp=yes \
     # --with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu/ \
     --enable-python3interp=yes \
-    --with-python3-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu \
+    --with-python3-config-dir=/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu \
     --enable-tclinterp=yes \
     --enable-gui=auto
 make
