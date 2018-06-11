@@ -6,6 +6,7 @@ apt-get install -y locales
 localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
 # 安装zsh并修改shell为zsh
+apt install -y git
 apt install -y zsh
 git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
 chsh -s /bin/zsh
@@ -24,7 +25,6 @@ apt install -y valgrind
 apt install -y ctags
 # sudo apt install -y cscope
 apt install -y openssl
-apt install -y git
 apt install -y silversearcher-ag
 apt install -y tmux
 apt install -y wget
