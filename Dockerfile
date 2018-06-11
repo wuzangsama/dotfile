@@ -7,7 +7,7 @@ ENV TZ "Asia/Shanghai"
 COPY install.sh /usr/local/
 
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
-RUN sh /usr/local/install.sh
+RUN /usr/local/install.sh
 
 COPY .vimrc /root/
 COPY .zshrc /root/

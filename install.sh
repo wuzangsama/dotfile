@@ -14,15 +14,15 @@ chsh -s /bin/zsh
 
 # 安装一些工具类软件
 apt install -y build-essential
-# apt install -y libtool
-# apt install -y automake
+apt install -y libtool
+apt install -y automake
 apt install -y gdb
 apt install -y cmake
 apt install -y clang
-# apt install -y libclang-dev
+apt install -y libclang-dev
 apt install -y valgrind
 apt install -y ctags
-# sudo apt install -y cscope
+apt install -y cscope
 apt install -y openssl
 apt install -y silversearcher-ag
 apt install -y tmux
