@@ -100,6 +100,10 @@ export EDITOR=/usr/bin/vim
 export PATH=$GOROOT/bin:$GOROOT/pkg/tool/linux_amd64:$GOPATH/bin:$PATH
 [ -z "$TMUX" ] && export TERM=xterm-256color
 
+export M2_HOME=/usr/local/maven
+export M2=$M2_HOME/bin
+export PATH=$M2:$PATH
+
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
