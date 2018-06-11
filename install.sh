@@ -1,4 +1,5 @@
 #/bin/bash
+set -e
 
 # 语言相关
 apt-get update
