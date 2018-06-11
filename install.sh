@@ -107,10 +107,10 @@ git checkout v8.1.0042
     --enable-rubyinterp=yes \
     --with-ruby-command=/usr/bin/ruby \
     --enable-perlinterp \
-    # --enable-pythoninterp=yes \
-    # --with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu/ \
+    --enable-pythoninterp=yes \
+    --with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu/ \
     --enable-python3interp=yes \
-    --with-python3-config-dir=/usr/lib/python3.6/config-3.6m-x86_64-linux-gnu \
+    --with-python3-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu \
     --enable-tclinterp=yes \
     --enable-gui=auto
 make

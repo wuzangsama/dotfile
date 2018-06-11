@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:17.10
 
 LABEL maintainer="zhanghf@zailingtech.com"
 
