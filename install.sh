@@ -1,52 +1,68 @@
 #/bin/bash
 
 # 语言相关
-sudo apt-get update
-sudo apt-get install -y locales
-sudo localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+apt-get update
+apt-get install -y locales
+localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+
+# 安装zsh并修改shell为zsh
+apt install -y zsh
+git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+chsh -s /bin/zsh
 
 # 安装一些工具类软件
-sudo apt install -y gcc
-sudo apt install -y g++
-sudo apt install -y make
-# sudo apt install -y libtool
-# sudo apt install -y automake
-sudo apt install -y gdb
-sudo apt install -y cmake
-sudo apt install -y clang
-# sudo apt install -y libclang-dev
-sudo apt install -y valgrind
-sudo apt install -y ctags
+apt install -y gcc
+apt install -y g++
+apt install -y make
+# apt install -y libtool
+# apt install -y automake
+apt install -y gdb
+apt install -y cmake
+apt install -y clang
+# apt install -y libclang-dev
+apt install -y valgrind
+apt install -y ctags
 # sudo apt install -y cscope
-sudo apt install -y openssl
-sudo apt install -y git
-sudo apt install -y silversearcher-ag
-sudo apt install -y tmux
-sudo apt install -y wget
-sudo apt install -y curl
-sudo apt install -y man
-sudo apt install -y zsh
-sudo git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
-sudo chsh -s /bin/zsh
+apt install -y openssl
+apt install -y git
+apt install -y silversearcher-ag
+apt install -y tmux
+apt install -y wget
+apt install -y curl
+apt install -y man
+
+# 安装java(暂时不设置环境变量)
+apt install -y software-properties-common
+add-apt-repository -y ppa:webupd8team/java
+apt-get update
+echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections
+apt-get install -y oracle-java8-installer
+update-java-alternatives -s java-8-oracle
+
+# 安装maven(环境变量设置在zshrc中)
+wget -O maven.tgz http://www.apache.org/dist/maven/maven-3/3.5.3/binaries/apache-maven-3.5.3-bin.tar.gz
+tar -C /usr/local -xzf maven.tgz
+ln -s /usr/local/apache-maven-3.5.3/ /usr/local/maven
+rm maven.tgz
 
 # 安装编译vim的依赖
-sudo apt install -y ruby
-sudo apt install -y ruby-dev
-sudo apt install -y lua5.1
-sudo apt install -y liblua5.1-0-dev
-sudo apt install -y luajit
-sudo apt install -y libluajit-5.1-dev
-sudo apt install -y perl
-sudo apt install -y libperl-dev
-sudo apt install -y tcl
-sudo apt install -y tcl-dev
-sudo apt install -y libtcl8.6
-sudo apt install -y libncurses5-dev
-sudo apt install -y python3
-sudo apt install -y python3-dev
+apt install -y ruby
+apt install -y ruby-dev
+apt install -y lua5.1
+apt install -y liblua5.1-0-dev
+apt install -y luajit
+apt install -y libluajit-5.1-dev
+apt install -y perl
+apt install -y libperl-dev
+apt install -y tcl
+apt install -y tcl-dev
+apt install -y libtcl8.6
+apt install -y libncurses5-dev
+apt install -y python3
+apt install -y python3-dev
 
 # 清理
-sudo rm -rf /var/lib/apt/lists/*
+rm -rf /var/lib/apt/lists/*
 
 # 安装go
 export GOROOT=/usr/local/go
@@ -98,7 +114,7 @@ git checkout v8.1.0042
     --enable-tclinterp=yes \
     --enable-gui=auto
 make
-sudo make install
+make install
 cd ..
 rm -rf vim
 
@@ -108,7 +124,7 @@ tar zxvf rtags-2.16.tar.gz
 cd rtags-2.16
 cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .
 make
-sudo make install
+make install
 cd ..
 rm -rf rtags-2.16/
 rm -rf rtags-2.16.tar.gz
@@ -119,6 +135,6 @@ cd Bear
 # git checkout 2.2.1
 cmake .
 make all
-sudo make install
+make install
 cd ..
 rm -rf Bear
