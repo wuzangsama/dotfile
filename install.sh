@@ -56,10 +56,10 @@ apt install -y tcl
 apt install -y tcl-dev
 apt install -y libtcl8.6
 apt install -y libncurses5-dev
-apt install -y python
-apt install -y python-dev
-apt install -y python3
-apt install -y python3-dev
+apt install -y python3.7
+apt install -y python3.7-dev
+apt install -y python2.7
+apt install -y python2.7-dev
 
 # 清理
 rm -rf /var/lib/apt/lists/*
@@ -73,25 +73,26 @@ wget -O go.tgz "$go_download_url"
 tar -C /usr/local -xzf go.tgz
 rm go.tgz
 go version
-go get -u github.com/klauspost/asmfmt/cmd/asmfmt
-go get -u github.com/derekparker/delve/cmd/dlv
-go get -u github.com/kisielk/errcheck
-go get -u github.com/davidrjenni/reftools/cmd/fillstruct
-go get -u github.com/nsf/gocode
-go get -u github.com/rogpeppe/godef
-go get -u github.com/zmb3/gogetdoc
-go get -u golang.org/x/tools/cmd/goimports
-go get -u github.com/golang/lint/golint
-go get -u github.com/alecthomas/gometalinter
-go get -u github.com/fatih/gomodifytags
-go get -u golang.org/x/tools/cmd/gorename
-go get -u github.com/jstemmer/gotags
-go get -u golang.org/x/tools/cmd/guru
-go get -u github.com/josharian/impl
-go get -u github.com/dominikh/go-tools/cmd/keyify
-go get -u github.com/fatih/motion
-go get -u github.com/golang/dep/cmd/dep
-go get -u github.com/cweill/gotests/...
+go get github.com/klauspost/asmfmt/cmd/asmfmt
+go get github.com/derekparker/delve/cmd/dlv
+go get github.com/kisielk/errcheck
+go get github.com/davidrjenni/reftools/cmd/fillstruct
+go get github.com/nsf/gocode
+go get github.com/rogpeppe/godef
+go get github.com/zmb3/gogetdoc
+go get golang.org/x/tools/cmd/goimports
+go get github.com/golang/lint/golint
+go get github.com/alecthomas/gometalinter
+go get github.com/fatih/gomodifytags
+go get golang.org/x/tools/cmd/gorename
+go get github.com/jstemmer/gotags
+go get golang.org/x/tools/cmd/guru
+go get github.com/josharian/impl
+go get github.com/dominikh/go-tools/cmd/keyify
+go get github.com/fatih/motion
+go get honnef.co/go/tools/cmd/megacheck
+go get github.com/golang/dep/cmd/dep
+go get github.com/cweill/gotests/...
 
 # 安装vim
 cd /usr/local/src
@@ -110,7 +111,7 @@ git checkout v8.1.0042
     --enable-pythoninterp=yes \
     --with-python-config-dir=/usr/lib/python2.7/config-x86_64-linux-gnu/ \
     --enable-python3interp=yes \
-    --with-python3-config-dir=/usr/lib/python3.5/config-3.5m-x86_64-linux-gnu \
+    --with-python3-config-dir=/usr/lib/python3.7/config-3.7m-x86_64-linux-gnu/ \
     --enable-tclinterp=yes \
     --enable-gui=auto
 make
