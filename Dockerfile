@@ -39,6 +39,7 @@ RUN apt update -y \
     && rm -rf /var/lib/apt/lists/*
 # 安装vim需要的工具包
 RUN apt update -y \
+    && echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections \
     && apt install -y openssl \
     && apt install -y ctags \
     && apt install -y cscope \
