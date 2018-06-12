@@ -34,9 +34,9 @@ RUN apt update -y \
     && apt install -y silversearcher-ag \
     && apt install -y tmux \
     && apt install -y zsh \
-    && git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh \
-    && chsh -s /bin/zsh \
     && rm -rf /var/lib/apt/lists/*
+RUN git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh \
+    && chsh -s /bin/zsh
 # 安装vim需要的工具包
 RUN apt update -y \
     && echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections \
@@ -143,7 +143,7 @@ RUN git clone https://github.com/rizsotto/Bear.git \
     && make all \
     && make install \
     && cd .. \
-    && rm -rf Bear \
+    && rm -rf Bear
 
 COPY .vimrc /root/
 COPY .tmux.conf /root/
