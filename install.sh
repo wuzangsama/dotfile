@@ -5,12 +5,7 @@ set -e
 apt-get update
 apt-get install -y locales
 localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
-
-# 安装zsh并修改shell为zsh
-apt install -y git
-apt install -y zsh
-git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
-chsh -s /bin/zsh
+echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
 
 # 安装一些工具类软件
 apt install -y build-essential
@@ -21,6 +16,7 @@ apt install -y cmake
 apt install -y clang
 apt install -y libclang-dev
 apt install -y valgrind
+apt install -y git
 apt install -y ctags
 apt install -y cscope
 apt install -y openssl
@@ -29,6 +25,9 @@ apt install -y tmux
 apt install -y wget
 apt install -y curl
 apt install -y man
+apt install -y zsh
+git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+chsh -s /bin/zsh
 
 # 安装java(暂时不设置环境变量)
 apt install -y software-properties-common
