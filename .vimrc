@@ -165,7 +165,7 @@ Plug 'octol/vim-cpp-enhanced-highlight',{'for': 'cpp'}
 Plug 'lyuts/vim-rtags', { 'for': ['c', 'cpp'] }
 
 " Go
-Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
+Plug 'fatih/vim-go', { 'tag': 'v1.17', 'do': ':GoInstallBinaries' }
 Plug 'buoto/gotests-vim'
 
 " 自动补全
