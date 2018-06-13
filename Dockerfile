@@ -124,8 +124,7 @@ RUN git clone https://github.com/vim/vim.git \
     && make \
     && make install \
     && cd .. \
-    && rm -rf vim/ \
-    && vim +qall
+    && rm -rf vim/
 # 安装rtags
 RUN wget https://andersbakken.github.io/rtags-releases/rtags-2.16.tar.gz \
     && tar zxvf rtags-2.16.tar.gz \
