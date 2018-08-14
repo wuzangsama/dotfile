@@ -57,7 +57,7 @@ filetype indent on
 " 函数 {{{
 " 生成tags
 function! s:generate_tags()
-        exec "!ctags -R --sort=1 --c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++ ."
+    exec "!ctags -R --sort=1 --c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++ ."
 endfunc
 
 " Strip whitespace
@@ -88,21 +88,21 @@ function! s:visual_selection() range
 endfunction
 
 function! s:statusline_expr()
-  let mod = "%{&modified ? '[+] ' : !&modifiable ? '[x] ' : ''}"
-  let ro  = "%{&readonly ? '[RO] ' : ''}"
-  let ft  = "%{len(&filetype) ? '['.&filetype.'] ' : ''}"
-  let fug = "%{exists('g:loaded_fugitive') ? fugitive#statusline() : ''}"
-  let sep = ' %= '
-  let pos = ' %-12(%l : %c%V%) '
-  let pct = ' %P'
+    let mod = "%{&modified ? '[+] ' : !&modifiable ? '[x] ' : ''}"
+    let ro  = "%{&readonly ? '[RO] ' : ''}"
+    let ft  = "%{len(&filetype) ? '['.&filetype.'] ' : ''}"
+    let fug = "%{exists('g:loaded_fugitive') ? fugitive#statusline() : ''}"
+    let sep = ' %= '
+    let pos = ' %-12(%l : %c%V%) '
+    let pct = ' %P'
 
-  return '[%n] %F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
+    return '[%n] %F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
 endfunction
 let &statusline = s:statusline_expr() " 设置statusline
 
 " Auto group {{{
 augroup vimrc
-  autocmd!
+    autocmd!
 augroup END
 
 autocmd vimrc SwapExists * let v:swapchoice = 'o' " 如已打开，自动选择只读
@@ -115,9 +115,9 @@ autocmd vimrc FileType c,cpp,java,php,javascript,python,rust,xml,yaml,perl,sql a
 
 " 插件安装 {{{
 if empty(glob('~/.vim/autoload/plug.vim'))
-  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+                \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 call plug#begin('~/.vim/bundle')
 
@@ -126,6 +126,9 @@ call plug#begin('~/.vim/bundle')
 
 " 外观
 Plug 'junegunn/seoul256.vim'
+Plug 'morhetz/gruvbox'
+Plug 'rakr/vim-one'
+Plug 'icymind/NeoSolarized'
 Plug 'luochen1990/rainbow'
 
 " 一般功能
@@ -156,6 +159,7 @@ Plug 'vim-scripts/EasyGrep'
 " 所有语言
 Plug 'junegunn/vim-easy-align'
 Plug 'tomtom/tcomment_vim' " 注释 gcc gcu gcap
+Plug 'w0rp/ale'
 
 " Dockerfile
 Plug 'honza/dockerfile.vim', {'for' : 'Dockerfile'}
@@ -165,7 +169,7 @@ Plug 'octol/vim-cpp-enhanced-highlight',{'for': 'cpp'}
 Plug 'lyuts/vim-rtags', { 'for': ['c', 'cpp'] }
 
 " Go
-Plug 'fatih/vim-go', { 'tag': 'v1.17', 'do': ':GoInstallBinaries' }
+Plug 'fatih/vim-go', { 'tag': 'v1.18', 'do': ':GoInstallBinaries' }
 Plug 'buoto/gotests-vim'
 
 " 自动补全
@@ -174,13 +178,14 @@ Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --java-co
 call plug#end()
 
 " 设置主题
-if !empty(glob('~/.vim/bundle/seoul256.vim'))
-    if !empty(glob('~/.vim/bundle/indentLine'))
-        let g:indentLine_color_term = 239
-        let g:indentLine_color_gui = '#616161'
-    endif
+if !empty(glob('~/.vim/bundle/gruvbox'))
+    set termguicolors
+    " if !empty(glob('~/.vim/bundle/indentLine'))
+    "     let g:indentLine_color_term = 239
+    "     let g:indentLine_color_gui = '#616161'
+    " endif
 
-    colorscheme seoul256
+    colorscheme gruvbox
 endif
 
 " rtags 重新绑定快捷键
@@ -246,6 +251,12 @@ if !empty(glob('~/.vim/bundle/YouCompleteMe'))
     let g:ycm_min_num_of_chars_for_completion = 2
     let g:ycm_seed_identifiers_with_syntax = 1
     let g:ycm_semantic_triggers =  {'c' : ['->', '.'], 'objc' : ['->', '.'], 'ocaml' : ['.', '#'], 'cpp,objcpp' : ['->', '.', '::'], 'php' : ['->', '::'], 'cs,java,javascript,vim,coffee,python,scala,go' : ['.'], 'ruby' : ['.', '::']}
+
+    augroup javaycm
+        autocmd!
+        autocmd FileType java nnoremap <buffer> <silent> <C-]> :YcmCompleter GoToDefinition<CR>
+    augroup END
+
     set completeopt-=preview
 endif
 
@@ -318,6 +329,16 @@ if !empty(glob('~/.vim/bundle/fzf.vim'))
     nnoremap <Leader>fhs :History/<cr>
     nnoremap <Leader>fhc :History:<cr>
     nnoremap <Leader>ft :BTags<cr>
+endif
+
+if !empty(glob('~/.vim/bundle/ale'))
+    let g:ale_linters_explicit = 1
+    let g:ale_linters = {
+                \ 'go': ['golint', 'go vet', 'gometalinter'],
+                \ }
+    let g:ale_go_gometalinter_options = '--fast'
+    let g:ale_go_gometalinter_lint_package = 1
+    let g:ale_open_list = 1
 endif
 
 if !empty(glob('~/.vim/bundle/tagbar'))
@@ -429,8 +450,8 @@ if !empty(glob('~/.vim/bundle/vim-go'))
 
     let g:go_autodetect_gopath = 1
 
-    let g:go_metalinter_autosave = 1
-    let g:go_metalinter_autosave_enabled = ['vet', 'golint', 'megacheck']
+    " let g:go_metalinter_autosave = 1
+    " let g:go_metalinter_autosave_enabled = ['vet', 'golint', 'errcheck']
     let g:go_highlight_space_tab_error = 0
     let g:go_highlight_array_whitespace_error = 0
     let g:go_highlight_trailing_whitespace_error = 0
