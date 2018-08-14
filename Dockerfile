@@ -98,14 +98,14 @@ RUN golang_download_url="https://golang.org/dl/go${GOLANG_VERSION}.${GOLANG_ARCH
     && go get -u github.com/golang/dep/cmd/dep \
     && go get -u github.com/cweill/gotests/...
 # 安装maven
-RUN wget -O maven.tgz http://www.apache.org/dist/maven/maven-3/3.5.3/binaries/apache-maven-3.5.3-bin.tar.gz \
+RUN wget -O maven.tgz http://www.apache.org/dist/maven/maven-3/3.5.4/binaries/apache-maven-3.5.4-bin.tar.gz \
     && tar -C /usr/local -xzf maven.tgz \
     && rm maven.tgz \
-    && ln -s /usr/local/apache-maven-3.5.3/ /usr/local/maven
+    && ln -s /usr/local/apache-maven-3.5.4/ /usr/local/maven
 # 安装vim
 RUN git clone https://github.com/vim/vim.git \
     && cd vim \
-    && git checkout v8.1.0042 \
+    && git checkout v8.1.0280 \
     && ./configure --prefix=/usr \
         --with-features=huge \
         --enable-multibyte \
