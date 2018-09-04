@@ -129,7 +129,7 @@ Plug 'junegunn/seoul256.vim'
 Plug 'morhetz/gruvbox'
 Plug 'rakr/vim-one'
 Plug 'icymind/NeoSolarized'
-Plug 'luochen1990/rainbow'
+Plug 'junegunn/rainbow_parentheses.vim'
 
 " 一般功能
 Plug 'Yggdroot/indentLine'
@@ -178,14 +178,15 @@ Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --java-co
 call plug#end()
 
 " 设置主题
-if !empty(glob('~/.vim/bundle/gruvbox'))
+if !empty(glob('~/.vim/bundle/seoul256.vim'))
     set termguicolors
-    " if !empty(glob('~/.vim/bundle/indentLine'))
-    "     let g:indentLine_color_term = 239
-    "     let g:indentLine_color_gui = '#616161'
-    " endif
+    let g:seoul256_background = 236
+    if !empty(glob('~/.vim/bundle/indentLine'))
+        let g:indentLine_color_term = 239
+        let g:indentLine_color_gui = '#616161'
+    endif
 
-    colorscheme gruvbox
+    colorscheme seoul256
 endif
 
 " rtags 重新绑定快捷键
@@ -260,30 +261,8 @@ if !empty(glob('~/.vim/bundle/YouCompleteMe'))
     set completeopt-=preview
 endif
 
-if !empty(glob('~/.vim/bundle/rainbow'))
-    let g:rainbow_active = 1
-    let g:rainbow_conf = {
-                \	'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick'],
-                \	'ctermfgs': ['lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],
-                \	'operators': '_,_',
-                \	'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
-                \	'separately': {
-                \		'*': {},
-                \		'tex': {
-                \			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/'],
-                \		},
-                \		'lisp': {
-                \			'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick', 'darkorchid3'],
-                \		},
-                \		'vim': {
-                \			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold', 'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody', 'start=/{/ end=/}/ fold containedin=vimFuncBody'],
-                \		},
-                \		'html': {
-                \			'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold'],
-                \		},
-                \		'css': 0,
-                \	}
-                \}
+if !empty(glob('~/.vim/bundle/rainbow_parentheses.vim'))
+    autocmd vimrc FileType c,cpp,java,php,javascript,python,rust,xml,yaml,perl,sql,go RainbowParentheses
 endif
 
 if !empty(glob('~/.vim/bundle/fzf.vim'))
@@ -336,7 +315,7 @@ if !empty(glob('~/.vim/bundle/ale'))
     let g:ale_linters = {
                 \ 'go': ['golint', 'go vet', 'gometalinter'],
                 \ }
-    let g:ale_go_gometalinter_options = '--fast'
+    let g:ale_go_gometalinter_options = '--disable-all --enable=errcheck'
     let g:ale_go_gometalinter_lint_package = 1
     let g:ale_open_list = 1
 endif
@@ -504,6 +483,7 @@ nnoremap <Leader>q :q<CR>
 nnoremap <Leader>w :w<CR>
 nnoremap <Leader>WQ :wa<CR>:q<CR>
 nnoremap <Leader>Q :qa!<CR>
+nnoremap Q :qa!<CR>
 nnoremap <Leader>cd :lcd %:h<CR>
 nnoremap <Leader>' :terminal<CR>
 
