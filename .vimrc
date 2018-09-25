@@ -313,10 +313,10 @@ endif
 if !empty(glob('~/.vim/bundle/ale'))
     let g:ale_linters_explicit = 1
     let g:ale_linters = {
-                \ 'go': ['golint', 'go vet', 'gometalinter'],
+                \ 'go': ['golint', 'go vet'],
                 \ }
-    let g:ale_go_gometalinter_options = '--disable-all --enable=errcheck'
-    let g:ale_go_gometalinter_lint_package = 1
+    " let g:ale_go_gometalinter_options = '--disable-all --enable=errcheck'
+    " let g:ale_go_gometalinter_lint_package = 1
     let g:ale_open_list = 1
 endif
 
