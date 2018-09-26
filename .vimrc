@@ -10,8 +10,8 @@ let mapleader=' '
 let maplocalleader=';'
 
 " 编码
-if &encoding !=? 'utf-8' | let &termencoding = &encoding | endif
-set encoding=utf-8 fileencoding=utf-8 fileformats=unix,mac,dos
+" if &encoding !=? 'utf-8' | let &termencoding = &encoding | endif
+set encoding=utf-8 fileencoding=utf-8 termencoding=utf-8 fileformats=unix,mac,dos
 set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
 
 " 界面相关
