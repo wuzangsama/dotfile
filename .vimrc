@@ -55,11 +55,6 @@ filetype indent on
 " }}}
 
 " 函数 {{{
-" 生成tags
-function! s:generate_tags()
-    exec "!ctags -R --sort=1 --c++-kinds=+p --fields=+iaS --extra=+q --language-force=C++ ."
-endfunc
-
 " Strip whitespace
 function! s:strip_trailing_whitespace()
     " Preparation: save last search, and cursor position.
@@ -173,7 +168,8 @@ Plug 'fatih/vim-go', { 'tag': 'v1.18', 'do': ':GoInstallBinaries' }
 Plug 'buoto/gotests-vim'
 
 " 自动补全
-Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --java-completer --system-libclang' }
+Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
+Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
 
 call plug#end()
 
@@ -225,7 +221,6 @@ endif
 
 if !empty(glob('~/.vim/bundle/YouCompleteMe'))
     let g:ycm_confirm_extra_conf = 0
-    let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
 
     let g:ycm_filetype_blacklist = {
                 \ 'tagbar' : 1,
@@ -255,7 +250,7 @@ if !empty(glob('~/.vim/bundle/YouCompleteMe'))
 
     augroup javaycm
         autocmd!
-        autocmd FileType java nnoremap <buffer> <silent> <C-]> :YcmCompleter GoToDefinition<CR>
+        autocmd FileType java,c,cpp nnoremap <buffer> <silent> <C-]> :YcmCompleter GoToImprecise<CR>
     augroup END
 
     set completeopt-=preview
@@ -493,8 +488,6 @@ nnoremap <C-l> <C-w>l
 nnoremap <C-h> <C-w>h
 nnoremap <C-k> <C-w>k
 nnoremap <C-j> <C-w>j
-
-nnoremap <F4> :call <SID>generate_tags()<cr><cr>
 
 vnoremap <Leader>fg :call <SID>visual_selection()<CR>
 nnoremap <Leader>fg :Ag 
