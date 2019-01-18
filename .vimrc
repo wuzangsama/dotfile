@@ -111,7 +111,7 @@ autocmd vimrc FileType c,cpp,java,php,javascript,python,rust,xml,yaml,perl,sql a
 if empty(glob('~/.vim/autoload/plug.vim'))
     silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
                 \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+    autocmd VimEnter * PlugInstall --sync
 endif
 call plug#begin('~/.vim/bundle')
 
@@ -165,7 +165,7 @@ Plug 'fatih/vim-go', { 'tag': 'v1.18', 'do': ':GoInstallBinaries' }
 Plug 'buoto/gotests-vim'
 
 " 自动补全
-Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --java-completer' }
+Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
 
 call plug#end()
 
