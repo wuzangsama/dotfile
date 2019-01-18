@@ -1,13 +1,18 @@
-" @file .vimrc
-" @brief
-" @author zhanghf@zailingtech.com
-" @version 1.0
-" @date 2017-07-29
+" vim: set foldmethod=marker foldlevel=0 nomodeline:
+" ==================================================
+" .vimrc of zhanghf
+" ==================================================
+
+" let s:darwin = has('mac')
 
 " 基础 {{{
 if &compatible | set nocompatible | endif
 let mapleader=' '
-let maplocalleader=';'
+let maplocalleader=' '
+
+augroup vimrc
+  autocmd!
+augroup END
 
 " 编码
 " if &encoding !=? 'utf-8' | let &termencoding = &encoding | endif
@@ -17,19 +22,44 @@ set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
 " 界面相关
 silent! set number relativenumber background=dark nowrap guioptions=
 silent! set ruler laststatus=2 showmode cursorline colorcolumn=80
-silent! set list listchars=tab:›\ ,trail:• scrolloff=3
-silent! set mouse=a mousehide guicursor=a:block-blinkon0 helplang=cn
+silent! set list listchars=tab:›\ ,trail:• scrolloff=3 modelines=2 synmaxcol=1000
+silent! set mouse=a mousehide guicursor=a:block-blinkon0 helplang=cn ttymouse=xterm2
 if has('gui_running') | set guifont=Monaco:h13 | else | set t_Co=256 | endif
+if exists('&fixeol') | set nofixeol | endif
+
+" 状态栏
+function! s:statusline_expr()
+  let mod = "%{&modified ? '[+] ' : !&modifiable ? '[x] ' : ''}"
+  let ro  = "%{&readonly ? '[RO] ' : ''}"
+  let ft  = "%{len(&filetype) ? '['.&filetype.'] ' : ''}"
+  let fug = "%{exists('g:loaded_fugitive') ? fugitive#statusline() : ''}"
+  let sep = ' %= '
+  let pos = ' %-12(%l : %c%V%) '
+  let pct = ' %P'
+
+  return '[%n] %F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
+endfunction
+let &statusline = s:statusline_expr()
+
+" Shift-tab on GNU screen
+" http://superuser.com/questions/195794/gnu-screen-shift-tab-issue
+silent! set t_kB=[Z
+
+" MacVim
+silent! set noimd imi=1 ims=-1
 
 " 编辑
 silent! set shiftwidth=4 expandtab tabstop=4 softtabstop=4
-silent! set nofoldenable foldlevel=2 foldmethod=indent
+silent! set nofoldenable foldlevel=2 foldmethod=indent complete-=i
 silent! set backspace=indent,eol,start formatoptions=cmMj
 silent! set tags=tags,./tags,../tags,../../tags,../../../tags
+" temporary files
+silent! set backupdir=/tmp//,. directory=/tmp//,.
+if v:version >= 703 | set undodir=/tmp//,. | endif
 
 " 剪切板
-" silent! set clipboard=unnamed
-" silent! set clipboard+=unnamedplus
+silent! set clipboard=unnamed
+silent! set clipboard+=unnamedplus
 
 " 搜索
 silent! set ignorecase smartcase incsearch hlsearch magic
@@ -55,6 +85,82 @@ filetype indent on
 " }}}
 
 " 函数 {{{
+function! s:can_complete(func, prefix)
+  if empty(a:func)
+    return 0
+  endif
+  let start = call(a:func, [1, ''])
+  if start < 0
+    return 0
+  endif
+
+  let oline  = getline('.')
+  let line   = oline[0:start-1] . oline[col('.')-1:]
+
+  let opos   = getpos('.')
+  let pos    = copy(opos)
+  let pos[2] = start + 1
+
+  call setline('.', line)
+  call setpos('.', pos)
+  let result = call(a:func, [0, matchstr(a:prefix, '\k\+$')])
+  call setline('.', oline)
+  call setpos('.', opos)
+
+  if !empty(type(result) == type([]) ? result : result.words)
+    call complete(start + 1, result)
+    return 1
+  endif
+  return 0
+endfunction
+
+function! s:feedkeys(k)
+  call feedkeys(a:k, 'n')
+  return ''
+endfunction
+
+function! s:super_duper_tab(pumvisible, next)
+  let [k, o] = a:next ? ["\<c-n>", "\<tab>"] : ["\<c-p>", "\<s-tab>"]
+  if a:pumvisible
+    return s:feedkeys(k)
+  endif
+
+  let line = getline('.')
+  let col = col('.') - 2
+  if line[col] !~ '\k\|[/~.]'
+    return s:feedkeys(o)
+  endif
+
+  let prefix = expand(matchstr(line[0:col], '\S*$'))
+  if prefix =~ '^[~/.]'
+    return s:feedkeys("\<c-x>\<c-f>")
+  endif
+  if s:can_complete(&omnifunc, prefix) || s:can_complete(&completefunc, prefix)
+    return ''
+  endif
+  return s:feedkeys(k)
+endfunction
+
+inoremap <silent> <tab>   <c-r>=<SID>super_duper_tab(pumvisible(), 1)<cr>
+inoremap <silent> <s-tab> <c-r>=<SID>super_duper_tab(pumvisible(), 0)<cr>
+" Close preview window
+" if exists('##CompleteDone')
+"     au CompleteDone * pclose
+" else
+au InsertLeave * if !pumvisible() && (!exists('*getcmdwintype') || empty(getcmdwintype())) | pclose | endif
+" endif
+
+function! s:root()
+  let root = systemlist('git rev-parse --show-toplevel')[0]
+  if v:shell_error
+    echo 'Not in git repo'
+  else
+    execute 'lcd' root
+    echo 'Changed directory to: '.root
+  endif
+endfunction
+command! Root call s:root()
+
 " Strip whitespace
 function! s:strip_trailing_whitespace()
     " Preparation: save last search, and cursor position.
@@ -82,24 +188,7 @@ function! s:visual_selection() range
     let @" = l:saved_reg
 endfunction
 
-function! s:statusline_expr()
-    let mod = "%{&modified ? '[+] ' : !&modifiable ? '[x] ' : ''}"
-    let ro  = "%{&readonly ? '[RO] ' : ''}"
-    let ft  = "%{len(&filetype) ? '['.&filetype.'] ' : ''}"
-    let fug = "%{exists('g:loaded_fugitive') ? fugitive#statusline() : ''}"
-    let sep = ' %= '
-    let pos = ' %-12(%l : %c%V%) '
-    let pct = ' %P'
-
-    return '[%n] %F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
-endfunction
-let &statusline = s:statusline_expr() " 设置statusline
-
 " Auto group {{{
-augroup vimrc
-    autocmd!
-augroup END
-
 autocmd vimrc SwapExists * let v:swapchoice = 'o' " 如已打开，自动选择只读
 autocmd vimrc BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif " 启动后定位到上次关闭光标位置
 autocmd vimrc FileType haskell,puppet,ruby,yaml setlocal expandtab shiftwidth=2 softtabstop=2
@@ -122,7 +211,6 @@ call plug#begin('~/.vim/bundle')
 " 外观
 Plug 'junegunn/seoul256.vim'
 Plug 'morhetz/gruvbox'
-Plug 'rakr/vim-one'
 Plug 'icymind/NeoSolarized'
 Plug 'junegunn/rainbow_parentheses.vim'
 
@@ -142,11 +230,11 @@ Plug 'Shougo/unite.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-fugitive'
-Plug 'airblade/vim-gitgutter'
+Plug 'mhinz/vim-signify'
 Plug 'junegunn/gv.vim'
 Plug 'junegunn/vim-slash'
 Plug 'junegunn/vim-peekaboo'
-Plug 'nvie/vim-togglemouse'
+" Plug 'nvie/vim-togglemouse'
 Plug 'vim-scripts/ReplaceWithRegister' " gr
 Plug 'terryma/vim-expand-region'
 Plug 'vim-scripts/EasyGrep'
@@ -164,12 +252,8 @@ Plug 'octol/vim-cpp-enhanced-highlight',{'for': 'cpp'}
 Plug 'lyuts/vim-rtags', { 'for': ['c', 'cpp'] }
 
 " Go
-Plug 'fatih/vim-go', { 'tag': 'v1.18', 'do': ':GoInstallBinaries' }
+Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
 Plug 'buoto/gotests-vim'
-
-" 自动补全
-Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
-Plug 'rdnetto/YCM-Generator', { 'branch': 'stable'}
 
 call plug#end()
 
@@ -219,45 +303,16 @@ if !empty(glob('~/.vim/bundle/vim-easy-align'))
     nmap ga <Plug>(EasyAlign)
 endif
 
-if !empty(glob('~/.vim/bundle/YouCompleteMe'))
-    let g:ycm_confirm_extra_conf = 0
-
-    let g:ycm_filetype_blacklist = {
-                \ 'tagbar' : 1,
-                \ 'qf' : 1,
-                \ 'notes' : 1,
-                \ 'markdown' : 1,
-                \ 'unite' : 1,
-                \ 'text' : 1,
-                \ 'vimwiki' : 1,
-                \ 'pandoc' : 1,
-                \ 'infolog' : 1,
-                \ 'mail' : 1,
-                \ 'mundo': 1,
-                \ 'fzf': 1,
-                \ 'ctrlp' : 1
-                \}
-
-    " 评论中也应用补全
-    let g:ycm_complete_in_comments = 1
-
-    let g:ycm_always_populate_location_list = 1
-
-    " 两个字开始补全
-    let g:ycm_min_num_of_chars_for_completion = 2
-    let g:ycm_seed_identifiers_with_syntax = 1
-    let g:ycm_semantic_triggers =  {'c' : ['->', '.'], 'objc' : ['->', '.'], 'ocaml' : ['.', '#'], 'cpp,objcpp' : ['->', '.', '::'], 'php' : ['->', '::'], 'cs,java,javascript,vim,coffee,python,scala,go' : ['.'], 'ruby' : ['.', '::']}
-
-    augroup javaycm
-        autocmd!
-        autocmd FileType java,c,cpp nnoremap <buffer> <silent> <C-]> :YcmCompleter GoToImprecise<CR>
-    augroup END
-
-    set completeopt-=preview
-endif
-
 if !empty(glob('~/.vim/bundle/rainbow_parentheses.vim'))
     autocmd vimrc FileType c,cpp,java,php,javascript,python,rust,xml,yaml,perl,sql,go RainbowParentheses
+endif
+
+if !empty(glob('~/.vim/bundle/vim-signify'))
+    let g:signify_vcs_list = ['git']
+    let g:signify_skip_filetype = { 'journal': 1 }
+    let g:signify_sign_add          = '│'
+    let g:signify_sign_change       = '│'
+    let g:signify_sign_changedelete = '│'
 endif
 
 if !empty(glob('~/.vim/bundle/fzf.vim'))
@@ -445,15 +500,15 @@ if !empty(glob('~/.vim/bundle/vim-go'))
         autocmd!
 
         " :GoImplements
-        autocmd FileType go nmap <silent> <localleader>j <Plug>(go-implements)
+        autocmd FileType go nmap <silent> <localleader>gj <Plug>(go-implements)
         " :GoTest
-        autocmd FileType go nmap <silent> <localleader>t  <Plug>(go-test)
+        autocmd FileType go nmap <silent> <localleader>gt  <Plug>(go-test)
         " :GoDoc
-        autocmd FileType go nmap <silent> <localleader>d <Plug>(go-doc)
+        autocmd FileType go nmap <silent> <localleader>gd <Plug>(go-doc)
         " :GoCoverageToggle
-        autocmd FileType go nmap <silent> <localleader>c <Plug>(go-coverage-toggle)
+        autocmd FileType go nmap <silent> <localleader>gc <Plug>(go-coverage-toggle)
         " :GoInfo
-        autocmd FileType go nmap <silent> <localleader>i <Plug>(go-info)
+        autocmd FileType go nmap <silent> <localleader>gi <Plug>(go-info)
 
         " :GoAlternate  commands :A, :AV, :AS and :AT
         autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
@@ -477,7 +532,6 @@ vnoremap > >gv
 nnoremap <Leader>q :q<CR>
 nnoremap <Leader>w :w<CR>
 nnoremap <Leader>WQ :wa<CR>:q<CR>
-nnoremap <Leader>Q :qa!<CR>
 nnoremap Q :qa!<CR>
 nnoremap <Leader>cd :lcd %:h<CR>
 nnoremap <Leader>' :terminal<CR>
