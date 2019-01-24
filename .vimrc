@@ -183,7 +183,7 @@ else
   Plug 'roxma/vim-hug-neovim-rpc'
 endif
 Plug 'zchee/deoplete-go', { 'do': 'make'}
-Plug 'Shougo/neco-syntax'
+" Plug 'Shougo/neco-syntax'
 
 call plug#end()
 
