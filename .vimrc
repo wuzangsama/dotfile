@@ -53,6 +53,16 @@ filetype indent on
 " }}}
 
 " 函数 {{{
+function! s:root()
+    let root = systemlist('git rev-parse --show-toplevel')[0]
+    if v:shell_error
+        echo 'Not in git repo'
+    else
+        execute 'lcd' root
+        echo 'Changed directory to: '.root
+    endif
+endfunction
+command! Root call s:root()
 
 " Strip whitespace
 function! s:strip_trailing_whitespace()
@@ -92,7 +102,7 @@ function! s:statusline_expr()
 
     return '[%n] %F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
 endfunction
-let &statusline = s:statusline_expr() " 设置statusline
+let &statusline = s:statusline_expr()
 
 " Auto group {{{
 augroup vimrc
@@ -161,11 +171,19 @@ Plug 'octol/vim-cpp-enhanced-highlight',{'for': 'cpp'}
 Plug 'lyuts/vim-rtags', { 'for': ['c', 'cpp'] }
 
 " Go
-Plug 'fatih/vim-go', { 'tag': 'v1.18', 'do': ':GoInstallBinaries' }
+Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
 Plug 'buoto/gotests-vim'
 
 " 自动补全
-Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
+if has('nvim')
+  Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+  Plug 'Shougo/deoplete.nvim'
+  Plug 'roxma/nvim-yarp'
+  Plug 'roxma/vim-hug-neovim-rpc'
+endif
+Plug 'zchee/deoplete-go', { 'do': 'make'}
+Plug 'Shougo/neco-syntax'
 
 call plug#end()
 
@@ -215,42 +233,73 @@ if !empty(glob('~/.vim/bundle/vim-easy-align'))
     nmap ga <Plug>(EasyAlign)
 endif
 
-if !empty(glob('~/.vim/bundle/YouCompleteMe'))
-    let g:ycm_confirm_extra_conf = 0
-    let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
+if !empty(glob('~/.vim/bundle/deoplete.nvim'))
+    let g:deoplete#enable_at_startup = 1
 
-    let g:ycm_filetype_blacklist = {
-                \ 'tagbar' : 1,
-                \ 'qf' : 1,
-                \ 'notes' : 1,
-                \ 'markdown' : 1,
-                \ 'unite' : 1,
-                \ 'text' : 1,
-                \ 'vimwiki' : 1,
-                \ 'pandoc' : 1,
-                \ 'infolog' : 1,
-                \ 'mail' : 1,
-                \ 'mundo': 1,
-                \ 'fzf': 1,
-                \ 'ctrlp' : 1
-                \}
+    function! s:can_complete(func, prefix)
+        if empty(a:func)
+            return 0
+        endif
+        let start = call(a:func, [1, ''])
+        if start < 0
+            return 0
+        endif
 
-    " 评论中也应用补全
-    let g:ycm_complete_in_comments = 1
+        let oline  = getline('.')
+        let line   = oline[0:start-1] . oline[col('.')-1:]
 
-    let g:ycm_always_populate_location_list = 1
+        let opos   = getpos('.')
+        let pos    = copy(opos)
+        let pos[2] = start + 1
 
-    " 两个字开始补全
-    let g:ycm_min_num_of_chars_for_completion = 2
-    let g:ycm_seed_identifiers_with_syntax = 1
-    let g:ycm_semantic_triggers =  {'c' : ['->', '.'], 'objc' : ['->', '.'], 'ocaml' : ['.', '#'], 'cpp,objcpp' : ['->', '.', '::'], 'php' : ['->', '::'], 'cs,java,javascript,vim,coffee,python,scala,go' : ['.'], 'ruby' : ['.', '::']}
+        call setline('.', line)
+        call setpos('.', pos)
+        let result = call(a:func, [0, matchstr(a:prefix, '\k\+$')])
+        call setline('.', oline)
+        call setpos('.', opos)
 
-    augroup javaycm
-        autocmd!
-        autocmd FileType java nnoremap <buffer> <silent> <C-]> :YcmCompleter GoToImprecise<CR>
-    augroup END
+        if !empty(type(result) == type([]) ? result : result.words)
+            call complete(start + 1, result)
+            return 1
+        endif
+        return 0
+    endfunction
 
-    set completeopt-=preview
+    function! s:feedkeys(k)
+        call feedkeys(a:k, 'n')
+        return ''
+    endfunction
+
+    function! s:super_duper_tab(pumvisible, next)
+        let [k, o] = a:next ? ["\<c-n>", "\<tab>"] : ["\<c-p>", "\<s-tab>"]
+        if a:pumvisible
+            return s:feedkeys(k)
+        endif
+
+        let line = getline('.')
+        let col = col('.') - 2
+        if line[col] !~ '\k\|[/~.]'
+            return s:feedkeys(o)
+        endif
+
+        let prefix = expand(matchstr(line[0:col], '\S*$'))
+        if prefix =~ '^[~/.]'
+            return s:feedkeys("\<c-x>\<c-f>")
+        endif
+        if s:can_complete(&omnifunc, prefix) || s:can_complete(&completefunc, prefix)
+            return ''
+        endif
+        return s:feedkeys(k)
+    endfunction
+
+    inoremap <silent> <tab>   <c-r>=<SID>super_duper_tab(pumvisible(), 1)<cr>
+    inoremap <silent> <s-tab> <c-r>=<SID>super_duper_tab(pumvisible(), 0)<cr>
+    " Close preview window
+    " if exists('##CompleteDone')
+    "     au CompleteDone * pclose
+    " else
+    au InsertLeave * if !pumvisible() && (!exists('*getcmdwintype') || empty(getcmdwintype())) | pclose | endif
+    " endif
 endif
 
 if !empty(glob('~/.vim/bundle/rainbow_parentheses.vim'))
