@@ -165,11 +165,11 @@ Plug 'buoto/gotests-vim'
 
 " 自动补全
 " if has('nvim')
-"   Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+"     Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 " else
-"   Plug 'Shougo/deoplete.nvim'
-"   Plug 'roxma/nvim-yarp'
-"   Plug 'roxma/vim-hug-neovim-rpc'
+"     Plug 'Shougo/deoplete.nvim'
+"     Plug 'roxma/nvim-yarp'
+"     Plug 'roxma/vim-hug-neovim-rpc'
 " endif
 " Plug 'zchee/deoplete-go', { 'do': 'make'}
 " Plug 'Shougo/neco-syntax'
@@ -400,6 +400,11 @@ if !empty(glob('~/.vim/bundle/tagbar'))
     nnoremap <F2> :Tagbar<CR>
     inoremap <F2> <ESC>:Tagbar<CR>
     vnoremap <F2> <ESC>:Tagbar<CR>
+endif
+
+if !empty(glob('~/.vim/bundle/delimitMate'))
+    let delimitMate_excluded_ft = "clojure,lisp"
+    let delimitMate_expand_cr = 1
 endif
 
 if !empty(glob('~/.vim/bundle/unite.vim'))
