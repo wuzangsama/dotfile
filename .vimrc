@@ -297,7 +297,7 @@ if !empty(glob('~/.vim/bundle/YouCompleteMe'))
 
     augroup javaycm
         autocmd!
-        autocmd FileType java nnoremap <buffer> <silent> <C-]> :YcmCompleter GoToImprecise<CR>
+        autocmd FileType java nnoremap <buffer> <silent> <C-]> :YcmCompleter GoToDefinition<CR>
     augroup END
 
     au InsertLeave * if !pumvisible() && (!exists('*getcmdwintype') || empty(getcmdwintype())) | pclose | endif
