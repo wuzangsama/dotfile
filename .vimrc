@@ -75,7 +75,7 @@ function! s:defx_my_settings() abort
   nnoremap <silent><buffer><expr> p
         \ defx#do_action('paste')
   nnoremap <silent><buffer><expr> l
-        \ defx#do_action('open')
+        \ defx#do_action('drop')
   nnoremap <silent><buffer><expr> E
         \ defx#do_action('open', 'vsplit')
   nnoremap <silent><buffer><expr> P
