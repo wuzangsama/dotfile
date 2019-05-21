@@ -52,10 +52,8 @@ endif
 " Browsing
 " -----------------------------------------------------------------------------
 Plug 'majutsushi/tagbar'
-nnoremap <F2> :Tagbar<CR>
-inoremap <F2> <ESC>:Tagbar<CR>
-vnoremap <F2> <ESC>:Tagbar<CR>
 let g:tagbar_sort = 0
+nnoremap <F2> :Tagbar<CR>
 if has('nvim')
   Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
 else
@@ -63,79 +61,7 @@ else
   Plug 'roxma/nvim-yarp'
   Plug 'roxma/vim-hug-neovim-rpc'
 endif
-autocmd FileType defx call s:defx_my_settings()
-function! s:defx_my_settings() abort
-  " Define mappings
-  nnoremap <silent><buffer><expr> <CR>
-        \ defx#do_action('open')
-  nnoremap <silent><buffer><expr> c
-        \ defx#do_action('copy')
-  nnoremap <silent><buffer><expr> m
-        \ defx#do_action('move')
-  nnoremap <silent><buffer><expr> p
-        \ defx#do_action('paste')
-  nnoremap <silent><buffer><expr> l
-        \ defx#do_action('drop')
-  nnoremap <silent><buffer><expr> E
-        \ defx#do_action('open', 'vsplit')
-  nnoremap <silent><buffer><expr> P
-        \ defx#do_action('open', 'pedit')
-  nnoremap <silent><buffer><expr> o
-        \ defx#do_action('open_or_close_tree')
-  nnoremap <silent><buffer><expr> K
-        \ defx#do_action('new_directory')
-  nnoremap <silent><buffer><expr> N
-        \ defx#do_action('new_file')
-  nnoremap <silent><buffer><expr> M
-        \ defx#do_action('new_multiple_files')
-  nnoremap <silent><buffer><expr> C
-        \ defx#do_action('toggle_columns',
-        \                'mark:indent:icon:filename:type:size:time')
-  nnoremap <silent><buffer><expr> S
-        \ defx#do_action('toggle_sort', 'time')
-  nnoremap <silent><buffer><expr> d
-        \ defx#do_action('remove')
-  nnoremap <silent><buffer><expr> r
-        \ defx#do_action('rename')
-  nnoremap <silent><buffer><expr> !
-        \ defx#do_action('execute_command')
-  nnoremap <silent><buffer><expr> x
-        \ defx#do_action('execute_system')
-  nnoremap <silent><buffer><expr> yy
-        \ defx#do_action('yank_path')
-  nnoremap <silent><buffer><expr> .
-        \ defx#do_action('toggle_ignored_files')
-  nnoremap <silent><buffer><expr> ;
-        \ defx#do_action('repeat')
-  nnoremap <silent><buffer><expr> h
-        \ defx#do_action('cd', ['..'])
-  nnoremap <silent><buffer><expr> ~
-        \ defx#do_action('cd')
-  nnoremap <silent><buffer><expr> q
-        \ defx#do_action('quit')
-  nnoremap <silent><buffer><expr> <Space>
-        \ defx#do_action('toggle_select') . 'j'
-  nnoremap <silent><buffer><expr> *
-        \ defx#do_action('toggle_select_all')
-  nnoremap <silent><buffer><expr> j
-        \ line('.') == line('$') ? 'gg' : 'j'
-  nnoremap <silent><buffer><expr> k
-        \ line('.') == 1 ? 'G' : 'k'
-  nnoremap <silent><buffer><expr> <C-l>
-        \ defx#do_action('redraw')
-  nnoremap <silent><buffer><expr> <C-g>
-        \ defx#do_action('print')
-  nnoremap <silent><buffer><expr> cd
-        \ defx#do_action('change_vim_cwd')
-endfunction
-nnoremap <F3> :Defx -split=vertical -winwidth=30 -direction=topleft -toggle<CR>
-inoremap <F3> <ESC>:Defx -split=vertical -winwidth=30 -direction=topleft -toggle<CR>
-vnoremap <F3> <ESC>:Defx -split=vertical -winwidth=30 -direction=topleft -toggle<CR>
-augroup defx_loader
-  autocmd!
-  autocmd BufEnter * if (!has('vim_starting') && winnr('$') == 1 && &filetype ==# 'defx') | q | endif
-augroup END
-Plug 'mhinz/vim-startify'
+
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 
@@ -616,12 +542,6 @@ let g:plug_window = '-tabnew'
 let g:plug_pwindow = 'vertical rightbelow new'
 
 " -----------------------------------------------------------------------------
-" vim-fugitive
-" -----------------------------------------------------------------------------
-nmap     <Leader>g :Gstatus<CR>gg<c-n>
-nnoremap <Leader>d :Gdiff<CR>
-
-" -----------------------------------------------------------------------------
 " <Enter> | vim-easy-align
 " -----------------------------------------------------------------------------
 let g:easy_align_delimiters = {
@@ -662,42 +582,96 @@ nmap gaa ga_
 xmap <Leader>ga   <Plug>(LiveEasyAlign)
 
 " -----------------------------------------------------------------------------
-" ALE
-" -----------------------------------------------------------------------------
-let g:ale_linters_explicit = 1
-let g:ale_linters = {
-      \ 'java': [],
-      \ 'yaml': [],
-      \ 'scala': [],
-      \'clojure': [],
-      \ 'go': ['golint', 'go vet'],
-      \ }
-let g:ale_fixers = {'ruby': ['rubocop']}
-let g:ale_open_list = 1
-let g:ale_lint_delay = 1000
-
-nmap ]a <Plug>(ale_next_wrap)
-nmap [a <Plug>(ale_previous_wrap)
-
-" -----------------------------------------------------------------------------
-" gv.vim / gl.vim
-" -----------------------------------------------------------------------------
-function! s:gv_expand()
-  let line = getline('.')
-  GV --name-status
-  call search('\V'.line, 'c')
-  normal! zz
-endfunction
-
-autocmd! FileType GV nnoremap <buffer> <silent> + :call <sid>gv_expand()<cr>
-
-" -----------------------------------------------------------------------------
 " splitjoin
 " -----------------------------------------------------------------------------
 let g:splitjoin_split_mapping = ''
 let g:splitjoin_join_mapping = ''
 nnoremap gss :SplitjoinSplit<cr>
 nnoremap gsj :SplitjoinJoin<cr>
+
+" -----------------------------------------------------------------------------
+" defx
+" -----------------------------------------------------------------------------
+call defx#custom#option('_', {
+      \ 'winwidth': 30,
+      \ 'split': 'vertical',
+      \ 'direction': 'topleft',
+      \ 'show_ignored_files': 0,
+      \ 'buffer_name': '',
+      \ 'toggle': 1,
+      \ 'resume': 1
+      \ })
+autocmd FileType defx call s:defx_my_settings()
+function! s:defx_my_settings() abort
+  " Define mappings
+  nnoremap <silent><buffer><expr> <CR>
+        \ defx#do_action('open')
+  nnoremap <silent><buffer><expr> c
+        \ defx#do_action('copy')
+  nnoremap <silent><buffer><expr> m
+        \ defx#do_action('move')
+  nnoremap <silent><buffer><expr> p
+        \ defx#do_action('paste')
+  nnoremap <silent><buffer><expr> l
+        \ defx#do_action('drop')
+  nnoremap <silent><buffer><expr> E
+        \ defx#do_action('open', 'vsplit')
+  nnoremap <silent><buffer><expr> P
+        \ defx#do_action('open', 'pedit')
+  nnoremap <silent><buffer><expr> o
+        \ defx#do_action('open_or_close_tree')
+  nnoremap <silent><buffer><expr> K
+        \ defx#do_action('new_directory')
+  nnoremap <silent><buffer><expr> N
+        \ defx#do_action('new_file')
+  nnoremap <silent><buffer><expr> M
+        \ defx#do_action('new_multiple_files')
+  nnoremap <silent><buffer><expr> C
+        \ defx#do_action('toggle_columns',
+        \                'mark:indent:icon:filename:type:size:time')
+  nnoremap <silent><buffer><expr> S
+        \ defx#do_action('toggle_sort', 'time')
+  nnoremap <silent><buffer><expr> d
+        \ defx#do_action('remove')
+  nnoremap <silent><buffer><expr> r
+        \ defx#do_action('rename')
+  nnoremap <silent><buffer><expr> !
+        \ defx#do_action('execute_command')
+  nnoremap <silent><buffer><expr> x
+        \ defx#do_action('execute_system')
+  nnoremap <silent><buffer><expr> yy
+        \ defx#do_action('yank_path')
+  nnoremap <silent><buffer><expr> .
+        \ defx#do_action('toggle_ignored_files')
+  nnoremap <silent><buffer><expr> ;
+        \ defx#do_action('repeat')
+  nnoremap <silent><buffer><expr> h
+        \ defx#do_action('cd', ['..'])
+  nnoremap <silent><buffer><expr> ~
+        \ defx#do_action('cd')
+  nnoremap <silent><buffer><expr> q
+        \ defx#do_action('quit')
+  nnoremap <silent><buffer><expr> <Space>
+        \ defx#do_action('toggle_select') . 'j'
+  nnoremap <silent><buffer><expr> *
+        \ defx#do_action('toggle_select_all')
+  nnoremap <silent><buffer><expr> j
+        \ line('.') == line('$') ? 'gg' : 'j'
+  nnoremap <silent><buffer><expr> k
+        \ line('.') == 1 ? 'G' : 'k'
+  nnoremap <silent><buffer><expr> <C-l>
+        \ defx#do_action('redraw')
+  nnoremap <silent><buffer><expr> <C-g>
+        \ defx#do_action('print')
+  nnoremap <silent><buffer><expr> cd
+        \ defx#do_action('change_vim_cwd')
+endfunction
+nnoremap <F3> :Defx<CR>
+augroup defx_loader
+  autocmd!
+  autocmd VimEnter * Defx
+  autocmd BufEnter * if (!has('vim_starting') && winnr('$') == 1 && &filetype ==# 'defx') | q | endif
+augroup END
 
 " -----------------------------------------------------------------------------
 " fzf
@@ -768,6 +742,24 @@ command! PlugHelp call fzf#run(fzf#wrap({
       \ 'sink':   function('s:plug_help_sink')}))
 
 " -----------------------------------------------------------------------------
+" vim-fugitive
+" -----------------------------------------------------------------------------
+nmap     <Leader>g :Gstatus<CR>gg<c-n>
+nnoremap <Leader>d :Gdiff<CR>
+
+" -----------------------------------------------------------------------------
+" gv.vim / gl.vim
+" -----------------------------------------------------------------------------
+function! s:gv_expand()
+  let line = getline('.')
+  GV --name-status
+  call search('\V'.line, 'c')
+  normal! zz
+endfunction
+
+autocmd! FileType GV nnoremap <buffer> <silent> + :call <sid>gv_expand()<cr>
+
+" -----------------------------------------------------------------------------
 " vim-go
 " -----------------------------------------------------------------------------
 let g:go_fmt_fail_silently = 1
@@ -811,6 +803,24 @@ let g:go_fold_enable = []
 " Open :GoDeclsDir with ctrl-g
 nnoremap <C-g> :GoDeclsDir<cr>
 inoremap <C-g> <esc>:<C-u>GoDeclsDir<cr>
+
+" -----------------------------------------------------------------------------
+" ALE
+" -----------------------------------------------------------------------------
+let g:ale_linters_explicit = 1
+let g:ale_linters = {
+      \ 'java': [],
+      \ 'yaml': [],
+      \ 'scala': [],
+      \'clojure': [],
+      \ 'go': ['golint', 'go vet'],
+      \ }
+let g:ale_fixers = {'ruby': ['rubocop']}
+let g:ale_open_list = 1
+let g:ale_lint_delay = 1000
+
+nmap ]a <Plug>(ale_next_wrap)
+nmap [a <Plug>(ale_previous_wrap)
 
 " }}}
 
