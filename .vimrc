@@ -54,13 +54,9 @@ endif
 Plug 'majutsushi/tagbar'
 let g:tagbar_sort = 0
 nnoremap <F2> :Tagbar<CR>
-if has('nvim')
-  Plug 'Shougo/defx.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-  Plug 'Shougo/defx.nvim'
-  Plug 'roxma/nvim-yarp'
-  Plug 'roxma/vim-hug-neovim-rpc'
-endif
+Plug 'Shougo/vinarise.vim'
+Plug 'shougo/vimfiler.vim'
+Plug 'Shougo/unite.vim'
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
@@ -592,86 +588,51 @@ nnoremap gsj :SplitjoinJoin<cr>
 " -----------------------------------------------------------------------------
 " defx
 " -----------------------------------------------------------------------------
-call defx#custom#option('_', {
-      \ 'winwidth': 30,
-      \ 'split': 'vertical',
-      \ 'direction': 'topleft',
-      \ 'show_ignored_files': 0,
-      \ 'buffer_name': '',
-      \ 'toggle': 1,
-      \ 'resume': 1
+let g:vimfiler_as_default_explorer = 1
+let g:vimfiler_ignore_pattern = [
+      \ '^\.git$',
+      \ '^\.DS_Store$',
+      \ '^\.init\.vim-rplugin\~$',
+      \ '^\.netrwhist$',
+      \ '\.class$'
+      \]
+call vimfiler#custom#profile('default', 'context', {
+      \ 'explorer' : 1,
+      \ 'winwidth' : 30,
+      \ 'winminwidth' : 30,
+      \ 'toggle' : 1,
+      \ 'auto_expand': 1,
+      \ 'explorer_columns' : 30,
+      \ 'parent': 0,
+      \ 'status' : 1,
+      \ 'safe' : 0,
+      \ 'split' : 1,
+      \ 'hidden': 1,
+      \ 'no_quit' : 1,
+      \ 'force_hide' : 0,
       \ })
-autocmd FileType defx call s:defx_my_settings()
-function! s:defx_my_settings() abort
-  " Define mappings
-  nnoremap <silent><buffer><expr> <CR>
-        \ defx#do_action('open')
-  nnoremap <silent><buffer><expr> c
-        \ defx#do_action('copy')
-  nnoremap <silent><buffer><expr> m
-        \ defx#do_action('move')
-  nnoremap <silent><buffer><expr> p
-        \ defx#do_action('paste')
-  nnoremap <silent><buffer><expr> l
-        \ defx#do_action('drop')
-  nnoremap <silent><buffer><expr> E
-        \ defx#do_action('open', 'vsplit')
-  nnoremap <silent><buffer><expr> P
-        \ defx#do_action('open', 'pedit')
-  nnoremap <silent><buffer><expr> o
-        \ defx#do_action('open_or_close_tree')
-  nnoremap <silent><buffer><expr> K
-        \ defx#do_action('new_directory')
-  nnoremap <silent><buffer><expr> N
-        \ defx#do_action('new_file')
-  nnoremap <silent><buffer><expr> M
-        \ defx#do_action('new_multiple_files')
-  nnoremap <silent><buffer><expr> C
-        \ defx#do_action('toggle_columns',
-        \                'mark:indent:icon:filename:type:size:time')
-  nnoremap <silent><buffer><expr> S
-        \ defx#do_action('toggle_sort', 'time')
-  nnoremap <silent><buffer><expr> d
-        \ defx#do_action('remove')
-  nnoremap <silent><buffer><expr> r
-        \ defx#do_action('rename')
-  nnoremap <silent><buffer><expr> !
-        \ defx#do_action('execute_command')
-  nnoremap <silent><buffer><expr> x
-        \ defx#do_action('execute_system')
-  nnoremap <silent><buffer><expr> yy
-        \ defx#do_action('yank_path')
-  nnoremap <silent><buffer><expr> .
-        \ defx#do_action('toggle_ignored_files')
-  nnoremap <silent><buffer><expr> ;
-        \ defx#do_action('repeat')
-  nnoremap <silent><buffer><expr> h
-        \ defx#do_action('cd', ['..'])
-  nnoremap <silent><buffer><expr> ~
-        \ defx#do_action('cd')
-  nnoremap <silent><buffer><expr> q
-        \ defx#do_action('quit')
-  nnoremap <silent><buffer><expr> <Space>
-        \ defx#do_action('toggle_select') . 'j'
-  nnoremap <silent><buffer><expr> *
-        \ defx#do_action('toggle_select_all')
-  nnoremap <silent><buffer><expr> j
-        \ line('.') == line('$') ? 'gg' : 'j'
-  nnoremap <silent><buffer><expr> k
-        \ line('.') == 1 ? 'G' : 'k'
-  nnoremap <silent><buffer><expr> <C-l>
-        \ defx#do_action('redraw')
-  nnoremap <silent><buffer><expr> <C-g>
-        \ defx#do_action('print')
-  nnoremap <silent><buffer><expr> cd
-        \ defx#do_action('change_vim_cwd')
-endfunction
-nnoremap <F3> :Defx<CR>
-augroup defx_loader
-  autocmd!
-  autocmd VimEnter * Defx
-  autocmd BufEnter * if (!has('vim_starting') && winnr('$') == 1 && &filetype ==# 'defx') | q | endif
+
+augroup vfinit
+  au!
+  autocmd FileType vimfiler call s:vimfilerinit()
+  autocmd vimenter * if !argc() | VimFilerExplorer | endif " 无文件打开显示vimfiler
+  autocmd BufEnter * if (!has('vim_starting') && winnr('$') == 1 && &filetype ==# 'vimfiler') |
+        \ q | endif
 augroup END
+function! s:vimfilerinit()
+  setl nonumber
+  setl norelativenumber
+
+  silent! nunmap <buffer> <C-l>
+  silent! nunmap <buffer> <C-j>
+
+  nmap <buffer> i       <Plug>(vimfiler_switch_to_history_directory)
+  nmap <buffer> <C-r>   <Plug>(vimfiler_redraw_screen)
+  nmap <buffer> u       <Plug>(vimfiler_smart_h)
+endf
+
+nnoremap <F3> :VimFilerExplorer<CR>
+
 
 " -----------------------------------------------------------------------------
 " fzf
