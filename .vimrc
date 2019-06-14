@@ -61,6 +61,8 @@ Plug 'Shougo/unite.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 
+Plug 'liuchengxu/vim-which-key'
+
 " -----------------------------------------------------------------------------
 " Git
 " -----------------------------------------------------------------------------
@@ -586,7 +588,7 @@ nnoremap gss :SplitjoinSplit<cr>
 nnoremap gsj :SplitjoinJoin<cr>
 
 " -----------------------------------------------------------------------------
-" defx
+" vimfiler
 " -----------------------------------------------------------------------------
 let g:vimfiler_as_default_explorer = 1
 let g:vimfiler_ignore_pattern = [
@@ -782,6 +784,13 @@ let g:ale_lint_delay = 1000
 
 nmap ]a <Plug>(ale_next_wrap)
 nmap [a <Plug>(ale_previous_wrap)
+
+" -----------------------------------------------------------------------------
+" vim-which-key
+" -----------------------------------------------------------------------------
+nnoremap <silent> <leader>      :<c-u>WhichKey '<Space>'<CR>
+nnoremap <silent> <localleader> :<c-u>WhichKey  '<Space>'<CR>
+
 
 " }}}
 
