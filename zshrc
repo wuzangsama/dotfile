@@ -7,7 +7,7 @@ export ZSH=$HOME/.oh-my-zsh
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-ZSH_THEME="ys"
+ZSH_THEME="robbyrussell"
 
 # Set list of themes to load
 # Setting this variable when ZSH_THEME=random
@@ -60,8 +60,14 @@ ZSH_THEME="ys"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
   git
+  autojump
   extract
-  tmux
+  git-open
+  docker
+  history
+  osx
+  zsh-autosuggestions
+  zsh-syntax-highlighting
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -73,6 +79,9 @@ source $ZSH/oh-my-zsh.sh
 # You may need to manually set your language environment
 export LANG=en_US.UTF-8
 
+export EDITOR="nvim"
+
+[ -z "$TMUX" ] && export TERM=xterm-256color
 # Preferred editor for local and remote sessions
 # if [[ -n $SSH_CONNECTION ]]; then
 #   export EDITOR='vim'
@@ -94,26 +103,16 @@ export LANG=en_US.UTF-8
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-export GOROOT=/usr/local/go
-export GOPATH=/go
-export EDITOR=/usr/bin/vim
-export PATH=$GOROOT/bin:$GOROOT/pkg/tool/linux_amd64:$GOPATH/bin:$PATH
-[ -z "$TMUX" ] && export TERM=xterm-256color
-
-export M2_HOME=/usr/local/maven
-export M2=$M2_HOME/bin
-export PATH=$M2:$PATH
 
 alias ..="cd .."
 alias ...="cd ../.."
 alias ....="cd ../../.."
 alias .....="cd ../../../.."
 alias ......="cd ../../../../.."
-alias cd.="cd .."
-alias cd..="cd .."
 alias l="ls -alF"
 alias ll="ls -l"
-alias vi="vim"
+alias vi="nvim"
+alias vim="nvim"
 alias tmux="tmux -u2"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
