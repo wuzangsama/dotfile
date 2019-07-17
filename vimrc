@@ -3,10 +3,10 @@
 " .vimrc of zhanghaifeng
 " =============================================================================
 
-
-" Vim 8 Defaults
-unlet! skip_defaults_vim
-silent! source $VIMRUNTIME/defaults.vim
+if &compatible | set nocompatible | endif
+syntax enable
+syntax on
+filetype plugin indent on
 
 " =============================================================================
 " VIM-PLUG {{{
@@ -41,19 +41,12 @@ Plug 'tomtom/tcomment_vim' " Comment: gcc gcu gcap
 Plug 'vim-scripts/ReplaceWithRegister' " gr
 Plug 'AndrewRadev/splitjoin.vim'
 Plug 'mbbill/undotree'
-let g:undotree_WindowLayout = 2
-nnoremap U :UndotreeToggle<CR>
-if exists('##TextYankPost')
-  Plug 'machakann/vim-highlightedyank'
-  let g:highlightedyank_highlight_duration = 100
-endif
+Plug 'machakann/vim-highlightedyank'
 
 " -----------------------------------------------------------------------------
 " Browsing
 " -----------------------------------------------------------------------------
 Plug 'majutsushi/tagbar'
-let g:tagbar_sort = 0
-nnoremap <F2> :Tagbar<CR>
 Plug 'Shougo/vinarise.vim'
 Plug 'shougo/vimfiler.vim'
 Plug 'Shougo/unite.vim'
@@ -68,15 +61,7 @@ Plug 'liuchengxu/vim-which-key'
 " -----------------------------------------------------------------------------
 Plug 'tpope/vim-fugitive'
 Plug 'junegunn/gv.vim'
-if v:version >= 703
-  Plug 'mhinz/vim-signify'
-  let g:signify_vcs_list = ['git']
-  let g:signify_sign_add          = '│'
-  let g:signify_sign_change       = '│'
-  let g:signify_sign_changedelete = '│'
-  let g:signify_sign_delete       = '│'
-  let g:signify_sign_delete_first_line = '‾'
-endif
+Plug 'mhinz/vim-signify'
 
 " -----------------------------------------------------------------------------
 " Lang
@@ -87,6 +72,7 @@ Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
 " Completion
 " -----------------------------------------------------------------------------
 Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install() }}
+Plug 'ervandew/supertab'
 
 " -----------------------------------------------------------------------------
 " Lint
@@ -109,121 +95,35 @@ augroup vimrc
   autocmd!
 augroup END
 
-set number
-set relativenumber
-set autoindent
-set smartindent
-set lazyredraw
-set laststatus=2
-set showcmd
-set visualbell
-set backspace=indent,eol,start
-set timeoutlen=500
-set whichwrap=b,s
-set shortmess=aIT
-set hlsearch " CTRL-L / CTRL-R W
-set incsearch
-set hidden
-set ignorecase
-set smartcase
-set wildmenu
-set wildmode=full
-set tabstop=4
-set shiftwidth=4
-set expandtab
-set smarttab
-set scrolloff=5
-set encoding=utf-8
-set list
-set listchars=tab:\|\ ,
-set virtualedit=block
-set nojoinspaces
-set diffopt=filler,vertical
-set autoread
-set clipboard=unnamed
-set foldlevelstart=99
-set grepformat=%f:%l:%c:%m,%f:%l:%m
-set completeopt=menuone,preview
-set nocursorline
-set nrformats=hex
-silent! set cryptmethod=blowfish2
+" -----------------------------------------------------------------------------
+" encoding
+" -----------------------------------------------------------------------------
+set encoding=utf-8 fileencoding=utf-8 termencoding=utf-8 fileformats=unix,mac,dos
+set fileencodings=ucs-bom,utf-8,cp936,gb18030,big5,euc-jp,euc-kr,latin1
 
-set formatoptions+=1
-if has('patch-7.3.541')
-  set formatoptions+=j
-endif
-if has('patch-7.4.338')
-  let &showbreak = '↳ '
-  set breakindent
-  set breakindentopt=sbr
-endif
-
-if has('termguicolors')
-  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-  set termguicolors
-endif
-
+" -----------------------------------------------------------------------------
+" UI
+" -----------------------------------------------------------------------------
+silent! set number relativenumber background=dark nowrap guioptions=
+silent! set ruler laststatus=2 showmode cursorline colorcolumn=80
+silent! set list listchars=tab:\|\ , scrolloff=5 t_ti= t_te=
+silent! set mouse=a mousehide helplang=cn
+if has('gui_running') | set guifont=Monaco:h13 | else | set t_Co=256 | endif
 function! s:statusline_expr()
-  let mod = "%{&modified ? '[+] ' : !&modifiable ? '[x] ' : ''}"
-  let ro  = "%{&readonly ? '[RO] ' : ''}"
-  let ft  = "%{len(&filetype) ? '['.&filetype.'] ' : ''}"
-  let fug = "%{exists('g:loaded_fugitive') ? fugitive#statusline() : ''}"
-  let sep = ' %= '
-  let pos = ' %-12(%l : %c%V%) '
-  let pct = ' %P'
+    let mod = "%{&modified ? '[+] ' : !&modifiable ? '[x] ' : ''}"
+    let ro  = "%{&readonly ? '[RO] ' : ''}"
+    let ft  = "%{len(&filetype) ? '['.&filetype.'] ' : ''}"
+    let fug = "%{exists('g:loaded_fugitive') ? fugitive#statusline() : ''}"
+    let sep = ' %= '
+    let pos = ' %-12(%l : %c%V%) '
+    let pct = ' %P'
 
-  return '[%n] %F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
+    return '[%n] %F %<'.mod.ro.ft.fug.sep.pos.'%*'.pct
 endfunction
 let &statusline = s:statusline_expr()
 
-set modelines=2
-set synmaxcol=1000
-
-" For MacVim
-set noimd
-set imi=1
-set ims=-1
-
-" ctags
-set tags=./tags;/
-
-" Annoying temporary files
-set backupdir=/tmp//,.
-set directory=/tmp//,.
-if v:version >= 703
-  set undodir=/tmp//,.
-endif
-
-" Shift-tab on GNU screen
-" http://superuser.com/questions/195794/gnu-screen-shift-tab-issue
-set t_kB=[Z
-
-" set complete=.,w,b,u,t
-set complete-=i
-
-" mouse
-silent! set ttymouse=xterm2
-set mouse=a
-
-" 80 chars/line
-set textwidth=0
-if exists('&colorcolumn')
-  set colorcolumn=80
-endif
-
-" Keep the cursor on the same column
-set nostartofline
-
-" FOOBAR=~/<CTRL-><CTRL-F>
-set isfname-==
-
-if exists('&fixeol')
-  set nofixeol
-endif
-
 if has('gui_running')
-  set guifont=Menlo:h14 columns=80 lines=40
+  set guifont=Menlo:h14
   silent! colo seoul256-light
 else
   silent! colo seoul256
@@ -254,6 +154,44 @@ if has('nvim')
         \   exe "normal! g`\"" |
         \ endif
 endif
+
+" -----------------------------------------------------------------------------
+" Edit
+" -----------------------------------------------------------------------------
+silent! set shiftwidth=4 expandtab tabstop=4 softtabstop=4
+silent! set nofoldenable foldlevel=2 foldmethod=indent
+silent! set backspace=indent,eol,start formatoptions=cmMj
+silent! set tags=tags,./tags
+silent! set clipboard=unnamed clipboard+=unnamedplus
+
+" -----------------------------------------------------------------------------
+" Search
+" -----------------------------------------------------------------------------
+silent! set ignorecase smartcase incsearch hlsearch magic
+
+" -----------------------------------------------------------------------------
+" Command
+" -----------------------------------------------------------------------------
+silent! set wildmenu wildmode=list:longest
+silent! set wildignore=*.~,*.?~,*.sw?,*.bak,*.hi,*.pyc,*.out,*.lock,*.DS_Store
+silent! set wildignore+=.hg,.git,.svn
+silent! set wildignore+=*.jpg,*.bmp,*.gif,*.png,*.jpeg
+silent! set wildignore+=*.o,*.obj,*.exe,*.dll,*.so,*.manifest
+
+" -----------------------------------------------------------------------------
+" Performance
+" -----------------------------------------------------------------------------
+silent! set updatetime=300 timeout timeoutlen=500 ttimeout ttimeoutlen=50 ttyfast lazyredraw
+
+" -----------------------------------------------------------------------------
+" Bell
+" -----------------------------------------------------------------------------
+silent! set noerrorbells visualbell t_vb=
+
+" -----------------------------------------------------------------------------
+" Tmp file
+" -----------------------------------------------------------------------------
+silent! set backupdir=/tmp//,. directory=/tmp//,. undodir=/tmp//,.
 
 " }}}
 
@@ -307,80 +245,6 @@ nnoremap [b :bprev<cr>
 " -----------------------------------------------------------------------------
 nnoremap ]t :tabn<cr>
 nnoremap [t :tabp<cr>
-
-" -----------------------------------------------------------------------------
-" <tab> / <s-tab> / <c-v><tab> | super-duper-tab
-" -----------------------------------------------------------------------------
-function! s:can_complete(func, prefix)
-  if empty(a:func)
-    return 0
-  endif
-  let start = call(a:func, [1, ''])
-  if start < 0
-    return 0
-  endif
-
-  let oline  = getline('.')
-  let line   = oline[0:start-1] . oline[col('.')-1:]
-
-  let opos   = getpos('.')
-  let pos    = copy(opos)
-  let pos[2] = start + 1
-
-  call setline('.', line)
-  call setpos('.', pos)
-  let result = call(a:func, [0, matchstr(a:prefix, '\k\+$')])
-  call setline('.', oline)
-  call setpos('.', opos)
-
-  if !empty(type(result) == type([]) ? result : result.words)
-    call complete(start + 1, result)
-    return 1
-  endif
-  return 0
-endfunction
-
-function! s:feedkeys(k)
-  call feedkeys(a:k, 'n')
-  return ''
-endfunction
-
-function! s:super_duper_tab(pumvisible, next)
-  let [k, o] = a:next ? ["\<c-n>", "\<tab>"] : ["\<c-p>", "\<s-tab>"]
-  if a:pumvisible
-    return s:feedkeys(k)
-  endif
-
-  let line = getline('.')
-  let col = col('.') - 2
-  if line[col] !~ '\k\|[/~.]'
-    return s:feedkeys(o)
-  endif
-
-  let prefix = expand(matchstr(line[0:col], '\S*$'))
-  if prefix =~ '^[~/.]'
-    return s:feedkeys("\<c-x>\<c-f>")
-  endif
-  if s:can_complete(&omnifunc, prefix) || s:can_complete(&completefunc, prefix)
-    return ''
-  endif
-  return s:feedkeys(k)
-endfunction
-
-inoremap <silent> <tab>   <c-r>=<SID>super_duper_tab(pumvisible(), 1)<cr>
-inoremap <silent> <s-tab> <c-r>=<SID>super_duper_tab(pumvisible(), 0)<cr>
-
-" TBD
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
 " -----------------------------------------------------------------------------
 " <Leader>c Close quickfix/location window
@@ -588,6 +452,37 @@ nnoremap gss :SplitjoinSplit<cr>
 nnoremap gsj :SplitjoinJoin<cr>
 
 " -----------------------------------------------------------------------------
+" highlightedyank
+" -----------------------------------------------------------------------------
+let g:highlightedyank_highlight_duration = 100
+
+" -----------------------------------------------------------------------------
+" undotree
+" -----------------------------------------------------------------------------
+nnoremap U :UndotreeToggle<CR>
+
+" -----------------------------------------------------------------------------
+" tagbar
+" -----------------------------------------------------------------------------
+let g:tagbar_sort = 0
+nnoremap <F2> :Tagbar<CR>
+
+" -----------------------------------------------------------------------------
+" supertab
+" -----------------------------------------------------------------------------
+let g:SuperTabDefaultCompletionType = "<c-n>"
+
+" -----------------------------------------------------------------------------
+" vim-signify
+" -----------------------------------------------------------------------------
+let g:signify_vcs_list = ['git']
+let g:signify_sign_add          = '│'
+let g:signify_sign_change       = '│'
+let g:signify_sign_changedelete = '│'
+let g:signify_sign_delete       = '│'
+let g:signify_sign_delete_first_line = '‾'
+
+" -----------------------------------------------------------------------------
 " vimfiler
 " -----------------------------------------------------------------------------
 let g:vimfiler_as_default_explorer = 1
@@ -634,7 +529,6 @@ function! s:vimfilerinit()
 endf
 
 nnoremap <F3> :VimFilerExplorer<CR>
-
 
 " -----------------------------------------------------------------------------
 " fzf
@@ -727,41 +621,13 @@ autocmd! FileType GV nnoremap <buffer> <silent> + :call <sid>gv_expand()<cr>
 " -----------------------------------------------------------------------------
 let g:go_fmt_fail_silently = 1
 let g:go_fmt_command = "goimports"
-let g:go_fmt_options = {
-      \ 'goimports': '-local do/',
-      \ }
 
-let g:go_debug_windows = {
-      \ 'vars':  'leftabove 35vnew',
-      \ 'stack': 'botright 10new',
-      \ }
+" let g:go_autodetect_gopath = 1
 
+" let g:go_highlight_build_constraints = 1
+" let g:go_highlight_operators = 1
 
-let g:go_test_prepend_name = 1
-let g:go_list_type = "quickfix"
-let g:go_auto_type_info = 0
-let g:go_auto_sameids = 0
-let g:go_info_mode = "gopls"
-
-let g:go_def_mode = "gopls"
-let g:go_echo_command_info = 1
-let g:go_autodetect_gopath = 1
-" let g:go_metalinter_autosave_enabled = ['vet', 'golint']
-" let g:go_metalinter_enabled = ['vet', 'golint']
-
-let g:go_highlight_space_tab_error = 0
-let g:go_highlight_array_whitespace_error = 0
-let g:go_highlight_trailing_whitespace_error = 0
-let g:go_highlight_extra_types = 0
-let g:go_highlight_build_constraints = 1
-let g:go_highlight_types = 0
-let g:go_highlight_operators = 1
-let g:go_highlight_format_strings = 0
-let g:go_highlight_function_calls = 0
-let g:go_gocode_propose_source = 1
-
-let g:go_modifytags_transform = 'camelcase'
-let g:go_fold_enable = []
+" let g:go_fold_enable = []
 
 " Open :GoDeclsDir with ctrl-g
 nnoremap <C-g> :GoDeclsDir<cr>
