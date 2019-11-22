@@ -446,6 +446,13 @@ if has_key(g:plugs, 'vim-highlightedyank')
 endif
 
 " -----------------------------------------------------------------------------
+" vim-autoformat
+" -----------------------------------------------------------------------------
+if has_key(g:plugs, 'vim-autoformat')
+  noremap <F4> :Autoformat<CR>
+endif
+
+" -----------------------------------------------------------------------------
 " undotree
 " -----------------------------------------------------------------------------
 if has_key(g:plugs, 'undotree')
@@ -763,10 +770,6 @@ augroup vimrc
 
   if has_key(g:plugs, 'rainbow_parentheses.vim')
     au FileType c,cpp,java,javascript,python,rust,go RainbowParentheses
-  endif
-
-  if has_key(g:plugs, 'vim-autoformat')
-    au BufWrite * :Autoformat
   endif
 
   " http://vim.wikia.com/wiki/Highlight_unwanted_spaces
