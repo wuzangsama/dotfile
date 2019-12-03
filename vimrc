@@ -44,6 +44,7 @@ Plug 'mbbill/undotree'
 Plug 'machakann/vim-highlightedyank'
 Plug 'jiangmiao/auto-pairs'
 Plug 'Chiel92/vim-autoformat'
+Plug 'editorconfig/editorconfig-vim'
 
 " -----------------------------------------------------------------------------
 " Browsing
@@ -446,10 +447,10 @@ if has_key(g:plugs, 'vim-highlightedyank')
 endif
 
 " -----------------------------------------------------------------------------
-" vim-autoformat
+" editorconfig-vim
 " -----------------------------------------------------------------------------
-if has_key(g:plugs, 'vim-autoformat')
-  noremap <F4> :Autoformat<CR>
+if has_key(g:plugs, 'editorconfig-vim')
+  let g:EditorConfig_exclude_patterns = ['fugitive://.\*', 'scp://.\*']
 endif
 
 " -----------------------------------------------------------------------------
@@ -681,6 +682,10 @@ if has_key(g:plugs, 'coc.nvim')
         \ coc#refresh()
   inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
+  " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
+  " Coc only does snippet and additional edit on confirm.
+  inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
+
   function! s:show_documentation()
     if (index(['vim', 'help'], &filetype) >= 0)
       execute 'h' expand('<cword>')
@@ -691,16 +696,24 @@ if has_key(g:plugs, 'coc.nvim')
 
   nnoremap <silent> K :call <SID>show_documentation()<CR>
 
+  " Highlight symbol under cursor on CursorHold
+  " autocmd CursorHold * silent call CocActionAsync('highlight')
+
   let g:go_doc_keywordprg_enabled = 0
+
+  " Remap keys for gotos
+  nmap <silent> <C-]> <Plug>(coc-definition)
+  nmap <silent> gy <Plug>(coc-type-definition)
+  nmap <silent> gi <Plug>(coc-implementation)
+  " gr已经被使用
+  nmap <silent> gR <Plug>(coc-references)
 
   " Use `[g` and `]g` to navigate diagnostics
   nmap <silent> [g <Plug>(coc-diagnostic-prev)
   nmap <silent> ]g <Plug>(coc-diagnostic-next)
 
-  augroup coc-config
-    autocmd!
-    autocmd VimEnter * nmap <silent> gd <Plug>(coc-definition)
-  augroup END
+  " Add status line support, for integration with other plugin, checkout `:h coc-status`
+  " set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 endif
 
 " -----------------------------------------------------------------------------
@@ -713,8 +726,6 @@ if has_key(g:plugs, 'vim-rtags')
     autocmd!
     autocmd FileType c,cpp nnoremap <silent> <localleader>ri :call rtags#SymbolInfo()<CR>
     autocmd FileType c,cpp nnoremap <silent> <localleader>rj :call rtags#JumpTo(g:SAME_WINDOW)<CR>
-    autocmd FileType c,cpp nnoremap <silent> <Ctrl-]> :call rtags#JumpTo(g:SAME_WINDOW)<CR>
-    autocmd FileType c,cpp nnoremap <silent> gd :call rtags#JumpTo(g:SAME_WINDOW)<CR>
     autocmd FileType c,cpp nnoremap <silent> <localleader>rJ :call rtags#JumpTo(g:SAME_WINDOW, { '--declaration-only' : '' })<CR>
     autocmd FileType c,cpp nnoremap <silent> <localleader>rS :call rtags#JumpTo(g:H_SPLIT)<CR>
     autocmd FileType c,cpp nnoremap <silent> <localleader>rV :call rtags#JumpTo(g:V_SPLIT)<CR>
@@ -729,7 +740,7 @@ if has_key(g:plugs, 'vim-rtags')
     autocmd FileType c,cpp nnoremap <silent> <localleader>rw :call rtags#RenameSymbolUnderCursor()<CR>
     autocmd FileType c,cpp nnoremap <silent> <localleader>rv :call rtags#FindVirtuals()<CR>
     autocmd FileType c,cpp nnoremap <silent> <localleader>rb :call rtags#JumpBack()<CR>
-    autocmd FileType c,cpp nnoremap <silent> <Ctrl-t> :call rtags#JumpBack()<CR>
+    autocmd FileType c,cpp nnoremap <silent> <C-t> :call rtags#JumpBack()<CR>
     autocmd FileType c,cpp nnoremap <silent> <localleader>rC :call rtags#FindSuperClasses()<CR>
     autocmd FileType c,cpp nnoremap <silent> <localleader>rc :call rtags#FindSubClasses()<CR>
     autocmd FileType c,cpp nnoremap <silent> <localleader>rd :call rtags#Diagnostics()<CR>
@@ -743,8 +754,8 @@ if has_key(g:plugs,'ale')
   let g:ale_linters_explicit = 1
   let g:ale_linters = {
         \ 'go': ['golint', 'go vet'],
-        \ 'cpp': ['clang-format','clangcheck'],
-        \ 'c': ['clang-format','clangtidy'],
+        \ 'cpp': ['clangtidy'],
+        \ 'c': ['clangtidy'],
         \ 'sh': ['language_server'],
         \ }
   let g:ale_cpp_clang_options='-std=c++11 -Wall'
@@ -770,6 +781,11 @@ augroup vimrc
 
   if has_key(g:plugs, 'rainbow_parentheses.vim')
     au FileType c,cpp,java,javascript,python,rust,go RainbowParentheses
+  endif
+
+  if has_key(g:plugs, 'vim-autoformat')
+    let ftlist = ['yaml', 'go'] " go和yaml不需要格式化
+    au BufWrite * if index(ftlist, &filetype) == -1 | :Autoformat | endif
   endif
 
   " http://vim.wikia.com/wiki/Highlight_unwanted_spaces
