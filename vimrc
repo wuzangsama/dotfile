@@ -43,8 +43,15 @@ Plug 'AndrewRadev/splitjoin.vim'
 Plug 'mbbill/undotree'
 Plug 'machakann/vim-highlightedyank'
 Plug 'jiangmiao/auto-pairs'
-Plug 'Chiel92/vim-autoformat'
 Plug 'editorconfig/editorconfig-vim'
+
+" Add maktaba and codefmt to the runtimepath.
+" (The latter must be installed before it can be used.)
+Plug 'google/vim-maktaba'
+Plug 'google/vim-codefmt'
+" Also add Glaive, which is used to configure codefmt's maktaba flags. See
+" `:help :Glaive` for usage.
+Plug 'google/vim-glaive'
 
 " -----------------------------------------------------------------------------
 " Browsing
@@ -453,6 +460,17 @@ if has_key(g:plugs, 'editorconfig-vim')
   let g:EditorConfig_exclude_patterns = ['fugitive://.\*', 'scp://.\*']
 endif
 
+
+" -----------------------------------------------------------------------------
+" vim-codefmt
+" -----------------------------------------------------------------------------
+if has_key(g:plugs, 'vim-codefmt')
+  call glaive#Install()
+  " Optional: Enable codefmt's default mappings on the <Leader>= prefix.
+  Glaive codefmt plugin[mappings]
+  " Glaive codefmt google_java_executable="java -jar /path/to/google-java-format-VERSION-all-deps.jar"
+endif
+
 " -----------------------------------------------------------------------------
 " undotree
 " -----------------------------------------------------------------------------
@@ -783,9 +801,10 @@ augroup vimrc
     au FileType c,cpp,java,javascript,python,rust,go RainbowParentheses
   endif
 
-  if has_key(g:plugs, 'vim-autoformat')
-    let ftlist = ['yaml', 'go'] " go和yaml不需要格式化
-    au BufWrite * if index(ftlist, &filetype) == -1 | :Autoformat | endif
+  if has_key(g:plugs, 'vim-codefmt')
+    autocmd FileType c,cpp,proto,javascript AutoFormatBuffer clang-format
+    autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
+    autocmd FileType vue AutoFormatBuffer prettier
   endif
 
   " http://vim.wikia.com/wiki/Highlight_unwanted_spaces
