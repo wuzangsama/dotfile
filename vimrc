@@ -79,6 +79,7 @@ Plug 'octol/vim-cpp-enhanced-highlight', {'for': 'cpp'}
 Plug 'vim-scripts/DoxygenToolkit.vim', { 'for': ['c', 'cpp'] }
 Plug 'lyuts/vim-rtags', { 'for': ['c', 'cpp'] }
 Plug 'ekalinin/Dockerfile.vim', {'for' : 'Dockerfile'}
+Plug 'bazelbuild/vim-bazel'
 
 " -----------------------------------------------------------------------------
 " Completion
@@ -802,6 +803,7 @@ augroup vimrc
   endif
 
   if has_key(g:plugs, 'vim-codefmt')
+    autocmd FileType bzl AutoFormatBuffer buildifier
     autocmd FileType c,cpp,proto,javascript AutoFormatBuffer clang-format
     autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
     autocmd FileType vue AutoFormatBuffer prettier
