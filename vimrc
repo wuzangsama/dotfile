@@ -525,6 +525,7 @@ if has_key(g:plugs, 'vimfiler.vim')
         \ 'hidden': 1,
         \ 'no_quit' : 1,
         \ 'force_hide' : 0,
+        \ 'auto_cd': 1,
         \ })
 
   augroup vfinit
@@ -773,11 +774,11 @@ if has_key(g:plugs,'ale')
   let g:ale_linters_explicit = 1
   let g:ale_linters = {
         \ 'go': ['golint', 'go vet'],
-        \ 'cpp': ['clangtidy'],
         \ 'c': ['clangtidy'],
+        \ 'cpp': ['clangtidy', 'cpplint'],
         \ 'sh': ['language_server'],
         \ }
-  let g:ale_cpp_clang_options='-std=c++11 -Wall'
+  let g:ale_cpp_clangtidy_extra_options = "-I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"
   let g:ale_fixers = {'ruby': ['rubocop']}
   let g:ale_open_list = 1
   let g:ale_lint_delay = 1000
@@ -815,6 +816,9 @@ augroup vimrc
 
   " Unset paste on InsertLeave
   au InsertLeave * silent! set nopaste
+
+  " 自动切换路径
+  autocmd BufEnter * silent! lcd %:p:h
 
   " Close preview window
   if exists('##CompleteDone')
