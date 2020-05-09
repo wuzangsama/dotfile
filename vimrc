@@ -469,7 +469,7 @@ if has_key(g:plugs, 'vim-codefmt')
   call glaive#Install()
   " Optional: Enable codefmt's default mappings on the <Leader>= prefix.
   Glaive codefmt plugin[mappings]
-  " Glaive codefmt google_java_executable="java -jar /path/to/google-java-format-VERSION-all-deps.jar"
+  " Glaive codefmt google_java_executable="java -jar /Users/zhanghf/Downloads/google-java-format-1.7-all-deps.jar"
 endif
 
 " -----------------------------------------------------------------------------
@@ -773,12 +773,15 @@ endif
 if has_key(g:plugs,'ale')
   let g:ale_linters_explicit = 1
   let g:ale_linters = {
-        \ 'go': ['golint', 'go vet'],
+        \ 'go': ['gometalinter'],
         \ 'c': ['clangtidy'],
         \ 'cpp': ['clangtidy', 'cpplint'],
         \ 'sh': ['language_server'],
+        \ 'java': ['checkstyle'],
         \ }
-  let g:ale_cpp_clangtidy_extra_options = "-I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1"
+  let g:ale_cpp_clangtidy_extra_options = '-I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1'
+  " let g:ale_go_golangci_lint_options = '--enable-all --disable=typecheck'
+  let g:ale_go_gometalinter_options = '--fast'
   let g:ale_fixers = {'ruby': ['rubocop']}
   let g:ale_open_list = 1
   let g:ale_lint_delay = 1000
@@ -797,7 +800,7 @@ augroup vimrc
   au BufNewFile,BufRead Dockerfile* set filetype=dockerfile
 
   au FileType markdown,text setlocal wrap
-  au FileType yaml,vim setlocal expandtab shiftwidth=2 softtabstop=2
+  au FileType yaml,vim,c,cpp setlocal expandtab shiftwidth=2 softtabstop=2
 
   if has_key(g:plugs, 'rainbow_parentheses.vim')
     au FileType c,cpp,java,javascript,python,rust,go RainbowParentheses
@@ -808,6 +811,7 @@ augroup vimrc
     autocmd FileType c,cpp,proto,javascript AutoFormatBuffer clang-format
     autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
     autocmd FileType vue AutoFormatBuffer prettier
+    autocmd FileType java AutoFormatBuffer google-java-format
   endif
 
   " http://vim.wikia.com/wiki/Highlight_unwanted_spaces
@@ -818,7 +822,7 @@ augroup vimrc
   au InsertLeave * silent! set nopaste
 
   " 自动切换路径
-  autocmd BufEnter * silent! lcd %:p:h
+  " autocmd BufEnter * silent! lcd %:p:h
 
   " Close preview window
   if exists('##CompleteDone')
