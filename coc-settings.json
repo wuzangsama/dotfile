@@ -2,19 +2,19 @@
     "languageserver": {
         "ccls": {
             "command": "ccls",
-            "filetypes": ["c", "cpp", "cuda", "objc", "objcpp"],
-            "rootPatterns": [".ccls", "compile_commands.json"],
+            "filetypes": ["c", "cpp", "objc", "objcpp"],
+            "rootPatterns": [".ccls", "compile_commands.json", ".vim/", ".git/", ".hg/"],
             "initializationOptions": {
                 "cache": {
-                    "directory": ".ccls-cache"
+                    "directory": "/tmp/ccls"
                 },
                 "clang": {
-                    "resourceDir": "/Library/Developer/CommandLineTools/usr/lib/clang/11.0.0",
+                    "resourceDir": "/Library/Developer/CommandLineTools/usr/lib/clang/12.0.0",
                     "extraArgs": [
                         "-isystem",
-                        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
+                        "/Library/Developer/CommandLineTools/usr/include/c++/v1",
                         "-I",
-                        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/"
+                        "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include"
                     ]
                 }
             }
@@ -22,6 +22,7 @@
         "golang": {
             "command": "gopls",
             "rootPatterns": ["go.mod"],
+            "disableWorkspaceFolders": true,
             "filetypes": ["go"]
         },
         "dockerfile": {
@@ -34,6 +35,11 @@
             "args": ["start"],
             "filetypes": ["sh"],
             "ignoredRootPaths": ["~"]
+        },
+        "sql": {
+            "command": "sql-language-server",
+            "args": ["up", "--method", "stdio"],
+            "filetypes": ["sql", "mysql"]
         }
     },
     "suggest.minTriggerInputLength": 2,

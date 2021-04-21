@@ -75,23 +75,25 @@ Plug 'mhinz/vim-signify'
 " Lang
 " -----------------------------------------------------------------------------
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
-Plug 'octol/vim-cpp-enhanced-highlight', {'for': 'cpp'}
-Plug 'vim-scripts/DoxygenToolkit.vim', { 'for': ['c', 'cpp'] }
-Plug 'lyuts/vim-rtags', { 'for': ['c', 'cpp'] }
 Plug 'ekalinin/Dockerfile.vim', {'for' : 'Dockerfile'}
-Plug 'bazelbuild/vim-bazel'
 
 " -----------------------------------------------------------------------------
 " Completion
 " -----------------------------------------------------------------------------
+Plug 'Shougo/neco-vim'
+Plug 'neoclide/coc-neco'
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
 
 " -----------------------------------------------------------------------------
 " Lint
 " -----------------------------------------------------------------------------
 Plug 'dense-analysis/ale'
+
+" -----------------------------------------------------------------------------
+" Wiki
+" -----------------------------------------------------------------------------
+" Plug 'vimwiki/vimwiki'
 
 call plug#end()
 
@@ -469,7 +471,6 @@ if has_key(g:plugs, 'vim-codefmt')
   call glaive#Install()
   " Optional: Enable codefmt's default mappings on the <Leader>= prefix.
   Glaive codefmt plugin[mappings]
-  " Glaive codefmt google_java_executable="java -jar /Users/zhanghf/Downloads/google-java-format-1.7-all-deps.jar"
 endif
 
 " -----------------------------------------------------------------------------
@@ -646,10 +647,82 @@ endif
 if has_key(g:plugs, 'vim-go')
   let g:go_fmt_fail_silently = 1
   let g:go_fmt_command = "goimports"
+  let g:go_debug_windows = {
+        \ 'vars':  'leftabove 35vnew',
+        \ 'stack': 'botright 10new',
+  \ }
 
-  " Open :GoDeclsDir with ctrl-g
-  nnoremap <C-g> :GoDeclsDir<cr>
-  inoremap <C-g> <esc>:<C-u>GoDeclsDir<cr>
+  let g:go_test_prepend_name = 1
+  let g:go_list_type = "quickfix"
+  let g:go_auto_type_info = 0
+  let g:go_auto_sameids = 0
+
+  let g:go_null_module_warning = 0
+  let g:go_echo_command_info = 1
+
+  let g:go_autodetect_gopath = 1
+  " let g:go_metalinter_autosave_enabled = ['vet', 'golint']
+  " let g:go_metalinter_enabled = ['vet', 'golint']
+
+  let g:go_info_mode = 'gopls'
+  let g:go_rename_command='gopls'
+  let g:go_gopls_complete_unimported = 1
+  let g:go_implements_mode='gopls'
+  let g:go_diagnostics_enabled = 1
+  let g:go_doc_popup_window = 1
+
+  let g:go_highlight_space_tab_error = 0
+  let g:go_highlight_array_whitespace_error = 0
+  let g:go_highlight_trailing_whitespace_error = 0
+  let g:go_highlight_extra_types = 0
+  let g:go_highlight_build_constraints = 1
+  let g:go_highlight_types = 0
+  let g:go_highlight_operators = 1
+  let g:go_highlight_format_strings = 0
+  let g:go_highlight_function_calls = 0
+  let g:go_gocode_propose_source = 1
+
+  let g:go_modifytags_transform = 'camelcase'
+  let g:go_fold_enable = []
+
+  nmap <C-g> :GoDecls<cr>
+  imap <C-g> <esc>:<C-u>GoDecls<cr>
+
+  " run :GoBuild or :GoTestCompile based on the go file
+  function! s:build_go_files()
+    let l:file = expand('%')
+    if l:file =~# '^\f\+_test\.go$'
+      call go#test#Test(0, 1)
+    elseif l:file =~# '^\f\+\.go$'
+      call go#cmd#Build(0)
+    endif
+  endfunction
+
+  augroup go
+    autocmd!
+
+    autocmd FileType go nmap <silent> <Leader>v <Plug>(go-def-vertical)
+    autocmd FileType go nmap <silent> <Leader>s <Plug>(go-def-split)
+    autocmd FileType go nmap <silent> <Leader>d <Plug>(go-def-tab)
+
+    autocmd FileType go nmap <silent> <Leader>x <Plug>(go-doc-vertical)
+
+    autocmd FileType go nmap <silent> <Leader>i <Plug>(go-info)
+    autocmd FileType go nmap <silent> <Leader>l <Plug>(go-metalinter)
+
+    autocmd FileType go nmap <silent> <leader>b :<C-u>call <SID>build_go_files()<CR>
+    autocmd FileType go nmap <silent> <leader>t  <Plug>(go-test)
+    autocmd FileType go nmap <silent> <leader>r  <Plug>(go-run)
+    autocmd FileType go nmap <silent> <leader>e  <Plug>(go-install)
+
+    autocmd FileType go nmap <silent> <Leader>c <Plug>(go-coverage-toggle)
+
+    " I like these more!
+    autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
+    autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
+    autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
+    autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
+  augroup END
 endif
 
 " -----------------------------------------------------------------------------
@@ -659,30 +732,6 @@ if has_key(g:plugs, 'ultisnips')
   let g:UltiSnipsExpandTrigger="<C-j>"
   let g:UltiSnipsJumpForwardTrigger="<C-j>"
   let g:UltiSnipsJumpBackwardTrigger="<C-k>"
-endif
-
-" -----------------------------------------------------------------------------
-" vim-cpp-enhanced-highlight
-" -----------------------------------------------------------------------------
-if has_key(g:plugs, 'vim-cpp-enhanced-highlight')
-  let g:cpp_class_scope_highlight = 1
-  let g:cpp_member_variable_highlight = 1
-  let g:cpp_class_decl_highlight = 1
-  let g:cpp_posix_standard = 1
-  let g:cpp_experimental_simple_template_highlight = 1
-  let g:cpp_concepts_highlight = 1
-  let g:cpp_no_function_highlight = 1
-  let c_no_curly_error=1
-endif
-
-" -----------------------------------------------------------------------------
-" DoxygenToolkit
-" -----------------------------------------------------------------------------
-if has_key(g:plugs, 'DoxygenToolkit.vim')
-  let g:DoxygenToolkit_authorName="zhanghf@zailingtech.com"
-  let g:DoxygenToolkit_versionString="1.0"
-  nnoremap <leader>da <ESC>gg:DoxAuthor<CR>
-  nnoremap <leader>df <ESC>:Dox<CR>
 endif
 
 " -----------------------------------------------------------------------------
@@ -734,37 +783,8 @@ if has_key(g:plugs, 'coc.nvim')
 
   " Add status line support, for integration with other plugin, checkout `:h coc-status`
   " set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-endif
 
-" -----------------------------------------------------------------------------
-" vim-rtags
-" -----------------------------------------------------------------------------
-if has_key(g:plugs, 'vim-rtags')
-  let g:rtagsUseDefaultMappings=0
-
-  augroup cpprtags
-    autocmd!
-    autocmd FileType c,cpp nnoremap <silent> <localleader>ri :call rtags#SymbolInfo()<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rj :call rtags#JumpTo(g:SAME_WINDOW)<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rJ :call rtags#JumpTo(g:SAME_WINDOW, { '--declaration-only' : '' })<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rS :call rtags#JumpTo(g:H_SPLIT)<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rV :call rtags#JumpTo(g:V_SPLIT)<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rT :call rtags#JumpTo(g:NEW_TAB)<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rp :call rtags#JumpToParent()<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rf :call rtags#FindRefs()<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rF :call rtags#FindRefsCallTree()<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rn :call rtags#FindRefsByName(input("Pattern? ", "", "customlist,rtags#CompleteSymbols"))<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rs :call rtags#FindSymbols(input("Pattern? ", "", "customlist,rtags#CompleteSymbols"))<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rr :call rtags#ReindexFile()<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rl :call rtags#ProjectList()<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rw :call rtags#RenameSymbolUnderCursor()<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rv :call rtags#FindVirtuals()<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rb :call rtags#JumpBack()<CR>
-    autocmd FileType c,cpp nnoremap <silent> <C-t> :call rtags#JumpBack()<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rC :call rtags#FindSuperClasses()<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rc :call rtags#FindSubClasses()<CR>
-    autocmd FileType c,cpp nnoremap <silent> <localleader>rd :call rtags#Diagnostics()<CR>
-  augroup END
+  autocmd FileType scss setl iskeyword+=@-@
 endif
 
 " -----------------------------------------------------------------------------
@@ -774,13 +794,9 @@ if has_key(g:plugs,'ale')
   let g:ale_linters_explicit = 1
   let g:ale_linters = {
         \ 'go': ['gometalinter'],
-        \ 'c': ['clangtidy'],
-        \ 'cpp': ['clangtidy', 'cpplint'],
         \ 'sh': ['language_server'],
-        \ 'java': ['checkstyle'],
+        \ 'java': [],
         \ }
-  let g:ale_cpp_clangtidy_extra_options = '-I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1'
-  " let g:ale_go_golangci_lint_options = '--enable-all --disable=typecheck'
   let g:ale_go_gometalinter_options = '--fast'
   let g:ale_fixers = {'ruby': ['rubocop']}
   let g:ale_open_list = 1
@@ -807,11 +823,10 @@ augroup vimrc
   endif
 
   if has_key(g:plugs, 'vim-codefmt')
-    autocmd FileType bzl AutoFormatBuffer buildifier
-    autocmd FileType c,cpp,proto,javascript AutoFormatBuffer clang-format
+    " autocmd FileType bzl AutoFormatBuffer buildifier
+    " autocmd FileType c,cpp,proto,javascript AutoFormatBuffer clang-format
     autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
     autocmd FileType vue AutoFormatBuffer prettier
-    autocmd FileType java AutoFormatBuffer google-java-format
   endif
 
   " http://vim.wikia.com/wiki/Highlight_unwanted_spaces
