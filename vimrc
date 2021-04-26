@@ -23,9 +23,11 @@ silent! if plug#begin('~/.vim/bundle')
 " -----------------------------------------------------------------------------
 Plug 'junegunn/seoul256.vim'
 Plug 'morhetz/gruvbox'
+Plug 'mhinz/vim-janah'
 
 " Rainbow parentheses
-Plug 'junegunn/rainbow_parentheses.vim'
+" Plug 'luochen1990/rainbow'
+" Plug 'junegunn/rainbow_parentheses.vim'
 
 " -----------------------------------------------------------------------------
 " Edit
@@ -64,6 +66,8 @@ Plug 'Shougo/unite.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 
+Plug 'mhinz/vim-startify'
+
 " -----------------------------------------------------------------------------
 " Git
 " -----------------------------------------------------------------------------
@@ -75,7 +79,23 @@ Plug 'mhinz/vim-signify'
 " Lang
 " -----------------------------------------------------------------------------
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
+
 Plug 'ekalinin/Dockerfile.vim', {'for' : 'Dockerfile'}
+
+Plug 'docunext/closetag.vim', { 'for': ['html', 'xml'] }
+
+Plug 'othree/yajs.vim' | Plug 'pangloss/vim-javascript'
+Plug 'kchmck/vim-coffee-script'
+Plug 'groenewege/vim-less'
+Plug 'heavenshell/vim-jsdoc', { 
+  \ 'for': ['javascript', 'javascript.jsx','typescript'], 
+  \ 'do': 'make install'
+\}
+Plug 'briancollins/vim-jst'
+" Plug 'mattn/emmet-vim'
+Plug 'cakebaker/scss-syntax.vim'
+Plug 'ap/vim-css-color'
+" Plug 'posva/vim-vue'
 
 " -----------------------------------------------------------------------------
 " Completion
@@ -138,12 +158,12 @@ function! s:statusline_expr()
 endfunction
 let &statusline = s:statusline_expr()
 
-if has_key(g:plugs, 'seoul256.vim')
+if has_key(g:plugs, 'vim-janah')
   if has('gui_running')
     set guifont=Menlo:h14
-    silent! colo seoul256-light
+    silent! colo janah
   else
-    silent! colo seoul256
+    silent! colo janah
   endif
 endif
 
@@ -194,7 +214,7 @@ silent! set ignorecase smartcase incsearch hlsearch magic
 silent! set wildmenu wildmode=list:longest
 silent! set wildignore=*.~,*.?~,*.sw?,*.bak,*.hi,*.pyc,*.out,*.lock,*.DS_Store
 silent! set wildignore+=.hg,.git,.svn
-silent! set wildignore+=*.jpg,*.bmp,*.gif,*.png,*.jpeg
+" silent! set wildignore+=*.jpg,*.bmp,*.gif,*.png,*.jpeg
 silent! set wildignore+=*.o,*.obj,*.exe,*.dll,*.so,*.manifest
 
 " -----------------------------------------------------------------------------
@@ -303,20 +323,6 @@ nnoremap <silent> gpi :<c-u>call <SID>go_indent(v:count1, -1)<cr>
 " =============================================================================
 
 " -----------------------------------------------------------------------------
-" :Root | Change directory to the root of the Git repository
-" -----------------------------------------------------------------------------
-function! s:root()
-  let root = systemlist('git rev-parse --show-toplevel')[0]
-  if v:shell_error
-    echo 'Not in git repo'
-  else
-    execute 'lcd' root
-    echo 'Changed directory to: '.root
-  endif
-endfunction
-command! Root call s:root()
-
-" -----------------------------------------------------------------------------
 " co? : Toggle options (inspired by unimpaired.vim)
 " -----------------------------------------------------------------------------
 function! s:map_change_option(...)
@@ -397,6 +403,32 @@ autocmd vimrc FileType vim-plug call s:setup_extra_keys()
 let g:plug_window = '-tabnew'
 let g:plug_pwindow = 'vertical rightbelow new'
 
+" if has_key(g:plugs, 'rainbow')
+"   let g:rainbow_active = 0
+"   let g:rainbow_conf = {
+" 	\	'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick'],
+" 	\	'ctermfgs': ['lightblue', 'lightyellow', 'lightcyan', 'lightmagenta'],
+" 	\	'operators': '_,_',
+" 	\	'parentheses': ['start=/(/ end=/)/ fold', 'start=/\[/ end=/\]/ fold', 'start=/{/ end=/}/ fold'],
+" 	\	'separately': {
+" 	\		'*': {},
+" 	\		'tex': {
+" 	\			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/'],
+" 	\		},
+" 	\		'lisp': {
+" 	\			'guifgs': ['royalblue3', 'darkorange3', 'seagreen3', 'firebrick', 'darkorchid3'],
+" 	\		},
+" 	\		'vim': {
+" 	\			'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold', 'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody', 'start=/{/ end=/}/ fold containedin=vimFuncBody'],
+" 	\		},
+" 	\		'html': {
+" 	\			'parentheses': ['start=/\v\<((area|base|br|col|embed|hr|img|input|keygen|link|menuitem|meta|param|source|track|wbr)[ >])@!\z([-_:a-zA-Z0-9]+)(\s+[-_:a-zA-Z0-9]+(\=("[^"]*"|'."'".'[^'."'".']*'."'".'|[^ '."'".'"><=`]*))?)*\>/ end=#</\z1># fold'],
+" 	\		},
+" 	\		'css': 0,
+" 	\	}
+" 	\}
+" endif
+
 " -----------------------------------------------------------------------------
 " <Enter> | vim-easy-align
 " -----------------------------------------------------------------------------
@@ -462,7 +494,6 @@ endif
 if has_key(g:plugs, 'editorconfig-vim')
   let g:EditorConfig_exclude_patterns = ['fugitive://.\*', 'scp://.\*']
 endif
-
 
 " -----------------------------------------------------------------------------
 " vim-codefmt
@@ -532,7 +563,7 @@ if has_key(g:plugs, 'vimfiler.vim')
   augroup vfinit
     au!
     autocmd FileType vimfiler call s:vimfilerinit()
-    autocmd vimenter * if !argc() | VimFilerExplorer | endif " 无文件打开显示vimfiler
+    autocmd vimenter * if !argc() | Startify | VimFilerExplorer | endif " 无文件打开显示vimfiler
     autocmd BufEnter * if (!has('vim_starting') && winnr('$') == 1 && &filetype ==# 'vimfiler') |
           \ q | endif
   augroup END
@@ -619,12 +650,17 @@ if has_key(g:plugs, 'fzf.vim')
         \ 'sink':   function('s:plug_help_sink')}))
 endif
 
+if has_key(g:plugs, 'vim-startify')
+  let g:startify_change_to_vcs_root = 1
+endif
+
 " -----------------------------------------------------------------------------
 " vim-fugitive
 " -----------------------------------------------------------------------------
 if has_key(g:plugs, 'vim-fugitive')
   nmap     <Leader>gs :Gstatus<CR>gg<c-n>
   nnoremap <Leader>gd :Gdiff<CR>
+  nnoremap <Leader>gc :Gcd<CR>
 endif
 
 " -----------------------------------------------------------------------------
@@ -725,6 +761,20 @@ if has_key(g:plugs, 'vim-go')
   augroup END
 endif
 
+if has_key(g:plugs, 'vim-jsdoc')
+  augroup js
+    autocmd!
+
+    autocmd FileType javascript,typescript nmap <silent> <Leader>d <Plug>(jsdoc)
+  augroup END
+endif
+
+if has_key(g:plugs, 'vim-javascript')
+  let g:javascript_plugin_jsdoc = 1
+  let g:javascript_plugin_ngdoc = 1
+  let g:javascript_plugin_flow = 1
+endif 
+
 " -----------------------------------------------------------------------------
 " ultisnips
 " -----------------------------------------------------------------------------
@@ -792,20 +842,29 @@ endif
 " -----------------------------------------------------------------------------
 if has_key(g:plugs,'ale')
   let g:ale_linters_explicit = 1
+  let g:ale_linter_aliases = {'jsx': ['css', 'javascript']}
+  let g:ale_linter_aliases = {'vue': ['vue', 'javascript']}
+  let g:ale_linters = {'vue': ['eslint', 'vls']}
   let g:ale_linters = {
         \ 'go': ['gometalinter'],
         \ 'sh': ['language_server'],
         \ 'java': [],
+        \ 'javascript': ['eslint'],
+        \ 'jsx': ['stylelint', 'eslint'],
+        \ 'vue': ['eslint', 'vls'],
         \ }
   let g:ale_go_gometalinter_options = '--fast'
-  let g:ale_fixers = {'ruby': ['rubocop']}
+  let g:ale_fixers = {
+        \ 'ruby': ['rubocop'],
+        \ 'javascript': ['prettier', 'eslint']
+        \ }
   let g:ale_open_list = 1
   let g:ale_lint_delay = 1000
+  " let g:ale_fix_on_save = 1
 
   nmap ]a <Plug>(ale_next_wrap)
   nmap [a <Plug>(ale_previous_wrap)
 endif
-
 " }}}
 
 " =============================================================================
@@ -814,19 +873,20 @@ endif
 augroup vimrc
   " File types
   au BufNewFile,BufRead Dockerfile* set filetype=dockerfile
+  au BufNewFile,BufRead *.jsx set filetype=javascript.jsx
 
   au FileType markdown,text setlocal wrap
-  au FileType yaml,vim,c,cpp setlocal expandtab shiftwidth=2 softtabstop=2
+  au FileType yaml,vim,c,cpp,javascript,json,html,css,xml,typescript setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
+  au BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 
-  if has_key(g:plugs, 'rainbow_parentheses.vim')
-    au FileType c,cpp,java,javascript,python,rust,go RainbowParentheses
-  endif
+  " if has_key(g:plugs, 'rainbow_parentheses.vim')
+  "   au FileType c,cpp,java,javascript,python,rust,go RainbowParentheses
+  " endif
 
   if has_key(g:plugs, 'vim-codefmt')
     " autocmd FileType bzl AutoFormatBuffer buildifier
     " autocmd FileType c,cpp,proto,javascript AutoFormatBuffer clang-format
-    autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
-    autocmd FileType vue AutoFormatBuffer prettier
+    autocmd FileType html,css,sass,scss,less,json,vue AutoFormatBuffer prettier
   endif
 
   " http://vim.wikia.com/wiki/Highlight_unwanted_spaces
